@@ -109,8 +109,7 @@ void Renderer::DrawBlocks(const std::vector<Block>& blocks, const glm::mat4& vp)
     m_cubeVA.Bind();
 
     for (const Block& block : blocks) {
-        glm::mat4 model(1.0f);
-        model = glm::translate(model, block.GetPosVec3() * 0.4f);
+        glm::mat4 model = glm::translate(model, block.GetPosVec3() * 0.4f);
         model = glm::scale(model, glm::vec3(0.2, 0.2, 0.2));
         
         m_blockShader.SetUniform1i("u_Texture", 0);
@@ -118,16 +117,68 @@ void Renderer::DrawBlocks(const std::vector<Block>& blocks, const glm::mat4& vp)
         m_blockShader.SetUniformMat4f("u_MVP", mvp);
 
         m_blockTextureManager.BindTopTexture(block.GetType());
-        Draw(m_cubeVA, m_cubeUpIB, m_blockShader);
+        m_cubeUpIB.Bind();
+        GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 
         m_blockTextureManager.BindSideTexture(block.GetType());
-        Draw(m_cubeVA, m_cubeFrontIB, m_blockShader);
-        Draw(m_cubeVA, m_cubeRightIB, m_blockShader);
-        Draw(m_cubeVA, m_cubeBackIB, m_blockShader);
-        Draw(m_cubeVA, m_cubeLeftIB, m_blockShader);
+        m_cubeFrontIB.Bind();
+        GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+        m_cubeRightIB.Bind();
+        GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+        m_cubeBackIB.Bind();
+        GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+        m_cubeLeftIB.Bind();
+        GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 
         m_blockTextureManager.BindBottomTexture(block.GetType());
-        Draw(m_cubeVA, m_cubeBottomIB, m_blockShader);
+        m_cubeBottomIB.Bind();
+        GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+    }
+}
+
+void Renderer::DrawChunks(const std::vector<Chunk>& chunks, const glm::mat4& vp)
+{
+    m_blockShader.Bind();
+    m_cubeVA.Bind();
+
+    for (const Chunk& chunk : chunks) {
+        for (const glm::ivec3& ind : chunk.BlocksToRender()) {
+            int x, y, z;
+            x = ind.r;
+            y = ind.g;
+            z = ind.b;
+            BlockType blockType = chunk.GetBlockType(x, y, z);
+            if (blockType == BlockType::AIR) continue;
+
+            glm::vec3 chunkOrigin = chunk.GetPosVec3() * 0.4f;
+            glm::vec3 blockLocalPos = glm::vec3(x, y, z) * 0.4f;
+
+            glm::mat4 model(1.0f);
+            model = glm::translate(model, chunkOrigin + blockLocalPos);
+            model = glm::scale(model, glm::vec3(0.2, 0.2, 0.2));
+
+            m_blockShader.SetUniform1i("u_Texture", 0);
+            glm::mat4 mvp = vp * model;
+            m_blockShader.SetUniformMat4f("u_MVP", mvp);
+
+            m_blockTextureManager.BindTopTexture(blockType);
+            m_cubeUpIB.Bind();
+            GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+
+            m_blockTextureManager.BindSideTexture(blockType);
+            m_cubeFrontIB.Bind();
+            GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+            m_cubeRightIB.Bind();
+            GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+            m_cubeBackIB.Bind();
+            GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+            m_cubeLeftIB.Bind();
+            GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+
+            m_blockTextureManager.BindBottomTexture(blockType);
+            m_cubeBottomIB.Bind();
+            GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+        }
     }
 }
 

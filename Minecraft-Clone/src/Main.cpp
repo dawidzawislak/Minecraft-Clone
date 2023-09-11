@@ -41,10 +41,14 @@ int main()
     glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)WND_WIDTH / (float)WND_HEIGHT, 0.1f, 100.0f);
     glm::mat4 view = glm::mat4(1.0f);
 
+    /*
     std::vector<Block> blocks;
     blocks.emplace_back(BlockType::GRASS, 0.0f, 0.0f, 0.0f);
     blocks.emplace_back(BlockType::DIRT, -2.0f, 0.0f, 0.0f);
     blocks.emplace_back(BlockType::STONE, 2.0f, 0.0f, 0.0f);
+    */
+    std::vector<Chunk> chunks;
+    chunks.emplace_back();
 
     Renderer renderer;
 
@@ -61,7 +65,8 @@ int main()
         // --- Draw ------------
         renderer.Clear();
 
-        renderer.DrawBlocks(blocks, vp);
+        //renderer.DrawBlocks(blocks, vp);
+        renderer.DrawChunks(chunks, vp);
 
         GLCall(glfwSwapBuffers(window));
 
