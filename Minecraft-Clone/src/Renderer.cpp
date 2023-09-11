@@ -86,7 +86,7 @@ Renderer::Renderer()
     m_cubeLeftIB.SetData(indicesLeft, 6);
     m_cubeRightIB.SetData(indicesRight, 6);
 
-    m_blockTextureManager.Initialize("res/textures/tiles.png");
+    m_blockTextureManager.Initialize("res/textures/tile_.png", 3);
 }
 
 Renderer::~Renderer()

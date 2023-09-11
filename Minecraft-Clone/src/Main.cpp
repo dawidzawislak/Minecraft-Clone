@@ -43,10 +43,8 @@ int main()
 
     std::vector<Block> blocks;
     blocks.emplace_back(BlockType::GRASS, 0.0f, 0.0f, 0.0f);
-    blocks.emplace_back(BlockType::GRASS, 1.0f, 0.0f, 0.0f);
-    blocks.emplace_back(BlockType::GRASS, 0.0f, 0.0f, 1.0f);
-    blocks.emplace_back(BlockType::GRASS, -1.0f, 0.0f, 0.0f);
-    blocks.emplace_back(BlockType::GRASS, 0.0f, 0.0f, -1.0f);
+    blocks.emplace_back(BlockType::DIRT, -2.0f, 0.0f, 0.0f);
+    blocks.emplace_back(BlockType::STONE, 2.0f, 0.0f, 0.0f);
 
     Renderer renderer;
 

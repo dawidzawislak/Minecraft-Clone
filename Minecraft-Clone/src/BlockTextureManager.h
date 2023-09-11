@@ -12,7 +12,7 @@ class BlockTextureManager
 	std::unordered_map<BlockType, Texture*> m_bottoms;
 
 public:
-	bool Initialize(const std::string& filePath);
+	bool Initialize(std::string fileNamesTemplate, int count);
 	void Release();
 
 	void BindSideTexture(BlockType type);
