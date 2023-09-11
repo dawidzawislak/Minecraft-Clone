@@ -1,10 +1,13 @@
 #pragma once
 
 #include <GL/glew.h>
+#include <vector>
 
 #include "Shader.h"
 #include "VertexArray.h"
 #include "IndexBuffer.h"
+#include "Block.h"
+#include "BlockTextureManager.h"
 
 
 #define ASSERT(x) if (!(x)) __debugbreak();
@@ -15,8 +18,27 @@ bool GLLogCall(const char* function, const char* file, int line);
 
 class Renderer
 {
+	BlockTextureManager m_blockTextureManager;
+	VertexArray m_cubeVA;
+	IndexBuffer m_cubeFrontIB;
+	IndexBuffer m_cubeBackIB;
+	IndexBuffer m_cubeLeftIB;
+	IndexBuffer m_cubeRightIB;
+	IndexBuffer m_cubeBottomIB;
+	IndexBuffer m_cubeUpIB;
+
+	VertexBuffer m_cubeVB;
+	VertexBufferLayout m_cubeLayout;
+
+	Shader m_blockShader;
+
 public:
+	Renderer();
+	~Renderer();
+
 	void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
+
+	void DrawBlocks(const std::vector<Block>& blocks, const glm::mat4& vp);
 	void Clear() const;
 };
 

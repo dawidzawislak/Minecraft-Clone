@@ -19,7 +19,7 @@ const unsigned int WND_WIDTH = 800;
 const unsigned int WND_HEIGHT = 600;
 
 // Camera stuff
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 2.0f));
 float lastX = WND_WIDTH / 2.0f;
 float lastY = WND_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -36,72 +36,17 @@ int main()
         std::cout << "Failed to init OpenGL and create window!";
         return -1;
     }
-    float vertices[] = {
-       -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-    };
-    unsigned int indices[] = {
-        0, 1, 2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35
-    };
-
-    VertexArray va;
-    VertexBuffer vb(vertices, sizeof(vertices));
-    VertexBufferLayout layout;
-    layout.Push<float>(3);
-    layout.Push<float>(2);
-    va.AddBuffer(vb, layout);
-
-    IndexBuffer ib(indices, 36);
+    
 
     glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)WND_WIDTH / (float)WND_HEIGHT, 0.1f, 100.0f);
     glm::mat4 view = glm::mat4(1.0f);
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -0.5f, 0.0f));
 
-    Shader shader("res/shaders/basic.shader");
-    shader.Bind();
-    Texture texture("res/textures/grass.png");
-    texture.Bind();
-
-    shader.SetUniform1i("u_Texture", 0);
+    std::vector<Block> blocks;
+    blocks.emplace_back(BlockType::GRASS, 0.0f, 0.0f, 0.0f);
+    blocks.emplace_back(BlockType::GRASS, 1.0f, 0.0f, 0.0f);
+    blocks.emplace_back(BlockType::GRASS, 0.0f, 0.0f, 1.0f);
+    blocks.emplace_back(BlockType::GRASS, -1.0f, 0.0f, 0.0f);
+    blocks.emplace_back(BlockType::GRASS, 0.0f, 0.0f, -1.0f);
 
     Renderer renderer;
 
@@ -113,14 +58,12 @@ int main()
         ProcessKeyboardInput(window);
 
         view = camera.GetViewMatrix();
-        glm::mat4 mvp = proj * view * model;
-        shader.SetUniformMat4f("u_MVP", mvp);
-
+        glm::mat4 vp = proj * view;
 
         // --- Draw ------------
         renderer.Clear();
 
-        renderer.Draw(va, ib, shader);
+        renderer.DrawBlocks(blocks, vp);
 
         GLCall(glfwSwapBuffers(window));
 
