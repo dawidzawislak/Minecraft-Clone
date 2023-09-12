@@ -48,7 +48,10 @@ int main()
     blocks.emplace_back(BlockType::STONE, 2.0f, 0.0f, 0.0f);
     */
     std::vector<Chunk> chunks;
-    chunks.emplace_back();
+    chunks.emplace_back(0,0);
+    chunks.emplace_back(-1,0);
+    chunks.emplace_back(1,0);
+
 
     Renderer renderer;
 

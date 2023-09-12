@@ -1,20 +1,20 @@
 #pragma once
 
 #include "Block.h"
-#include <vector>
+#include <unordered_map>
 
 class Chunk
 {
 private:
 	BlockType m_blocks[16][16][256];
-	std::vector<glm::ivec3> m_blocksToRender;
+	std::unordered_map<std::string, int> m_blocksToRender;
 	int m_xPos, m_zPos;
 
 public:
-	Chunk();
+	Chunk(int x, int y);
 	~Chunk();
 
 	BlockType GetBlockType(unsigned int x, unsigned int y, unsigned int z) const { return m_blocks[x][z][y]; }
-	const std::vector<glm::ivec3>& BlocksToRender() const { return m_blocksToRender; }
+	const std::unordered_map<std::string, int>& BlocksToRender() const { return m_blocksToRender; }
 	glm::vec3 GetPosVec3() const { return glm::vec3(m_xPos, -256.0f, m_zPos); }
 };

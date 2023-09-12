@@ -1,2 +1,6 @@
 ﻿  Chunk.cpp
+C:\dev\Minecraft-Clone\Minecraft-Clone\src\Chunk.cpp(7,13): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\dev\Minecraft-Clone\Minecraft-Clone\src\Chunk.cpp(8,13): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+  Renderer.cpp
+  Generating Code...
   Minecraft-Clone.vcxproj -> C:\dev\Minecraft-Clone\bin\x64\Debug\Minecraft-Clone.exe

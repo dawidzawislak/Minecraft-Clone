@@ -87,6 +87,10 @@ Renderer::Renderer()
     m_cubeRightIB.SetData(indicesRight, 6);
 
     m_blockTextureManager.Initialize("res/textures/tile_.png", 3);
+
+
+    GLCall(glEnable(GL_CULL_FACE));
+    GLCall(glCullFace(GL_BACK));
 }
 
 Renderer::~Renderer()
@@ -136,21 +140,37 @@ void Renderer::DrawBlocks(const std::vector<Block>& blocks, const glm::mat4& vp)
     }
 }
 
+const std::vector<std::string> explode(const std::string& s, const char& c)
+{
+    std::string buff{ "" };
+    std::vector<std::string> v;
+
+    for (auto n : s)
+    {
+        if (n != c) buff += n; else
+            if (n == c && buff != "") { v.push_back(buff); buff = ""; }
+    }
+    if (buff != "") v.push_back(buff);
+
+    return v;
+}
+
 void Renderer::DrawChunks(const std::vector<Chunk>& chunks, const glm::mat4& vp)
 {
     m_blockShader.Bind();
     m_cubeVA.Bind();
 
     for (const Chunk& chunk : chunks) {
-        for (const glm::ivec3& ind : chunk.BlocksToRender()) {
-            int x, y, z;
-            x = ind.r;
-            y = ind.g;
-            z = ind.b;
-            BlockType blockType = chunk.GetBlockType(x, y, z);
-            if (blockType == BlockType::AIR) continue;
+        glm::vec3 chunkOrigin = chunk.GetPosVec3() * 0.4f;
 
-            glm::vec3 chunkOrigin = chunk.GetPosVec3() * 0.4f;
+        for (auto block = chunk.BlocksToRender().begin(); block != chunk.BlocksToRender().end(); block++) {
+            int x, y, z;
+            auto values = explode(block->first, ';');
+            x = atoi(values[0].c_str());
+            y = atoi(values[1].c_str());
+            z = atoi(values[2].c_str());
+            BlockType blockType = chunk.GetBlockType(x, y, z);
+            
             glm::vec3 blockLocalPos = glm::vec3(x, y, z) * 0.4f;
 
             glm::mat4 model(1.0f);
@@ -161,23 +181,37 @@ void Renderer::DrawChunks(const std::vector<Chunk>& chunks, const glm::mat4& vp)
             glm::mat4 mvp = vp * model;
             m_blockShader.SetUniformMat4f("u_MVP", mvp);
 
-            m_blockTextureManager.BindTopTexture(blockType);
-            m_cubeUpIB.Bind();
-            GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+            int facesFlags = block->second;
+
+            if (facesFlags & 0x100000) {
+                m_blockTextureManager.BindTopTexture(blockType);
+                m_cubeUpIB.Bind();
+                GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+            }
 
             m_blockTextureManager.BindSideTexture(blockType);
-            m_cubeFrontIB.Bind();
-            GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
-            m_cubeRightIB.Bind();
-            GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
-            m_cubeBackIB.Bind();
-            GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
-            m_cubeLeftIB.Bind();
-            GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+            if (facesFlags & 0x10) {
+                m_cubeFrontIB.Bind();
+                GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+            }
+            if (facesFlags & 0x100) {
+                m_cubeRightIB.Bind();
+                GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+            }
+            if (facesFlags & 0x1000) {
+                m_cubeBackIB.Bind();
+                GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+            }
+            if ((facesFlags & 0x1)) {
+                m_cubeLeftIB.Bind();
+                GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+            }
 
-            m_blockTextureManager.BindBottomTexture(blockType);
-            m_cubeBottomIB.Bind();
-            GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+            if (facesFlags & 0x10000) {
+                m_blockTextureManager.BindBottomTexture(blockType);
+                m_cubeBottomIB.Bind();
+                GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+            }
         }
     }
 }
