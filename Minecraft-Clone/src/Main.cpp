@@ -4,6 +4,7 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "Camera.h"
+#include "FastNoiseLite/FastNoiseLite.h"
 
 #include <GLFW/glfw3.h>
 
@@ -28,6 +29,12 @@ bool firstMouse = true;
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
+FastNoiseLite gen;
+double noise(double nx, double ny) { // if using fastnoiselite
+    // Rescale from -1.0:+1.0 to 0.0:1.0
+    return gen.GetNoise(nx, ny) / 2.0 + 0.5;
+}
+
 int main()
 {
     GLFWwindow* window = nullptr;
@@ -41,16 +48,26 @@ int main()
     glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)WND_WIDTH / (float)WND_HEIGHT, 0.1f, 100.0f);
     glm::mat4 view = glm::mat4(1.0f);
 
-    /*
-    std::vector<Block> blocks;
-    blocks.emplace_back(BlockType::GRASS, 0.0f, 0.0f, 0.0f);
-    blocks.emplace_back(BlockType::DIRT, -2.0f, 0.0f, 0.0f);
-    blocks.emplace_back(BlockType::STONE, 2.0f, 0.0f, 0.0f);
-    */
-    std::vector<Chunk> chunks;
-    chunks.emplace_back(0,0);
-    chunks.emplace_back(-1,0);
-    chunks.emplace_back(1,0);
+
+    float elevation[4][4][16*16];
+    for (int y = 0; y < 64; y++) 
+        for (int x = 0; x < 64; x++) {
+            float e = 1 * noise(1 * x, 1 * y);
+            +0.5 * noise(2 * x, 2 * y);
+            +0.5 * noise(4 * x, 4 * y);
+            elevation[x / 16][y / 16][(x % 16) * 16 + (y % 16)] = e / (2.0);
+        }
+
+
+    Chunk* chunksTab = new Chunk[4*4];
+
+    for (int y = 0; y < 4; y++)
+        for (int x = 0; x < 4; x++)
+            chunksTab[x*4+y].Initialize(x, y, elevation[x][y]);
+
+    for (int y = 0; y < 4; y++)
+        for (int x = 0; x < 4; x++)
+            chunksTab[x * 4 + y].Update(x > 0 ? &chunksTab[(x-1) * 4 + y] : nullptr, x < 3 ? &chunksTab[(x + 1) * 4 + y]: nullptr, y > 0 ? &chunksTab[x*4 + y - 1] : nullptr, y < 3 ? &chunksTab[x*4 + y + 1] : nullptr);
 
 
     Renderer renderer;
@@ -69,12 +86,14 @@ int main()
         renderer.Clear();
 
         //renderer.DrawBlocks(blocks, vp);
-        renderer.DrawChunks(chunks, vp);
+        renderer.DrawChunks(chunksTab, 4, 4, vp);
 
         GLCall(glfwSwapBuffers(window));
 
         GLCall(glfwPollEvents());
     }
+
+    delete[] chunksTab;
 
     glfwTerminate();
     return 0;

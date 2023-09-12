@@ -155,21 +155,22 @@ const std::vector<std::string> explode(const std::string& s, const char& c)
     return v;
 }
 
-void Renderer::DrawChunks(const std::vector<Chunk>& chunks, const glm::mat4& vp)
+void Renderer::DrawChunks(Chunk* chunks, int cntX, int cntY, const glm::mat4& vp)
 {
     m_blockShader.Bind();
     m_cubeVA.Bind();
 
-    for (const Chunk& chunk : chunks) {
-        glm::vec3 chunkOrigin = chunk.GetPosVec3() * 0.4f;
+    for (int i = 0; i < cntX; i++)
+        for (int j = 0; j < cntY; j++) {
+        glm::vec3 chunkOrigin = chunks[i*cntX + j].GetPosVec3() * 0.4f;
 
-        for (auto block = chunk.BlocksToRender().begin(); block != chunk.BlocksToRender().end(); block++) {
+        for (auto block = chunks[i * cntX + j].BlocksToRender().begin(); block != chunks[i * cntX + j].BlocksToRender().end(); block++) {
             int x, y, z;
             auto values = explode(block->first, ';');
             x = atoi(values[0].c_str());
             y = atoi(values[1].c_str());
             z = atoi(values[2].c_str());
-            BlockType blockType = chunk.GetBlockType(x, y, z);
+            BlockType blockType = chunks[i * cntX + j].GetBlockType(x, y, z);
             
             glm::vec3 blockLocalPos = glm::vec3(x, y, z) * 0.4f;
 

@@ -3,6 +3,8 @@
 #include "Block.h"
 #include <unordered_map>
 
+
+
 class Chunk
 {
 private:
@@ -11,8 +13,13 @@ private:
 	int m_xPos, m_zPos;
 
 public:
-	Chunk(int x, int y);
+	Chunk(int x, int y, float* heights);
+	Chunk() {};
 	~Chunk();
+
+
+	void Initialize(int x, int y, float* heights);
+	void Update(Chunk* xmin1Chunk, const Chunk* xplus1Chunk, Chunk* zmin1Chunk, const Chunk* zplus1Chunk);
 
 	BlockType GetBlockType(unsigned int x, unsigned int y, unsigned int z) const { return m_blocks[x][z][y]; }
 	const std::unordered_map<std::string, int>& BlocksToRender() const { return m_blocksToRender; }

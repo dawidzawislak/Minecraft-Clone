@@ -41,7 +41,7 @@ public:
 
 	void DrawBlocks(const std::vector<Block>& blocks, const glm::mat4& vp);
 
-	void DrawChunks(const std::vector<Chunk>& chunks, const glm::mat4& vp);
+	void DrawChunks(Chunk* chunks, int cntX, int cntY, const glm::mat4& vp);
 
 	void Clear() const;
 };

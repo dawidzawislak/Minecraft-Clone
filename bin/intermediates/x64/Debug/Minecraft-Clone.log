@@ -1,6 +1,6 @@
-﻿  Chunk.cpp
-C:\dev\Minecraft-Clone\Minecraft-Clone\src\Chunk.cpp(7,13): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-C:\dev\Minecraft-Clone\Minecraft-Clone\src\Chunk.cpp(8,13): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-  Renderer.cpp
-  Generating Code...
+﻿  Main.cpp
+C:\dev\Minecraft-Clone\Minecraft-Clone\src\Main.cpp(55,21): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\dev\Minecraft-Clone\Minecraft-Clone\src\Main.cpp(56,18): warning C4552: '*': result of expression not used
+C:\dev\Minecraft-Clone\Minecraft-Clone\src\Main.cpp(57,18): warning C4552: '*': result of expression not used
+C:\dev\Minecraft-Clone\Minecraft-Clone\src\Main.cpp(58,69): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
   Minecraft-Clone.vcxproj -> C:\dev\Minecraft-Clone\bin\x64\Debug\Minecraft-Clone.exe
