@@ -159,7 +159,8 @@ void Renderer::DrawChunks(Chunk* chunks, int cntX, int cntY, const glm::mat4& vp
 {
     m_blockShader.Bind();
     m_cubeVA.Bind();
-
+    m_blockShader.SetUniform1i("u_Texture", 0);
+    
     for (int i = 0; i < cntX; i++)
         for (int j = 0; j < cntY; j++) {
         glm::vec3 chunkOrigin = chunks[i*cntX + j].GetPosVec3() * 0.4f;
@@ -178,7 +179,7 @@ void Renderer::DrawChunks(Chunk* chunks, int cntX, int cntY, const glm::mat4& vp
             model = glm::translate(model, chunkOrigin + blockLocalPos);
             model = glm::scale(model, glm::vec3(0.2, 0.2, 0.2));
 
-            m_blockShader.SetUniform1i("u_Texture", 0);
+
             glm::mat4 mvp = vp * model;
             m_blockShader.SetUniformMat4f("u_MVP", mvp);
 
@@ -189,7 +190,6 @@ void Renderer::DrawChunks(Chunk* chunks, int cntX, int cntY, const glm::mat4& vp
                 m_cubeUpIB.Bind();
                 GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
             }
-
             m_blockTextureManager.BindSideTexture(blockType);
             if (facesFlags & 0x10) {
                 m_cubeFrontIB.Bind();

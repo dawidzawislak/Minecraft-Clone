@@ -7,6 +7,11 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
 	UpdateCameraVectors();
 }
 
+void Camera::SetCameraPosition(glm::vec3 position)
+{
+    m_cameraPos = position;
+}
+
 glm::mat4 Camera::GetViewMatrix()
 {
 	return glm::lookAt(m_cameraPos, m_cameraPos + m_front, m_up);
@@ -26,9 +31,9 @@ void Camera::ProcessKeyboard(Direction direction, float deltaTime)
         m_cameraPos += m_right * velocity;
 
     if (direction == Direction::UP)
-        m_cameraPos += m_up * velocity;
+        m_cameraPos += m_worldUp * velocity;
     if (direction == Direction::DOWN)
-        m_cameraPos -= m_up * velocity;
+        m_cameraPos -= m_worldUp * velocity;
 }
 
 void Camera::ProcessMouseMovement(float xOffset, float yOffset, bool constrainPitch)
