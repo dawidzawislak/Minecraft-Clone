@@ -19,8 +19,6 @@ private:
 
 	FastNoiseLite m_NoiseGen;
 
-	BlockTextureManager m_BlockTextureManager;
-
 	Chunk m_testChunk;
 	int noIndices;
 

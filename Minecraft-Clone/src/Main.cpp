@@ -4,23 +4,25 @@
 #include "Shader.h"
 #include "Texture.h"
 
+#include "BlockTextureManager.h"
 #include <iostream>
-
-
-FastNoiseLite gen;
-
-double noise(double nx, double ny) { // if using fastnoiselite
-    // Rescale from -1.0:+1.0 to 0.0:1.0
-    return gen.GetNoise(nx, ny) / 2.0 + 0.5;
-}
 
 int main()
 {
     Game game("Minecraft Clone", 1280, 720);
     game.Run();
-
     /*
+    std::cout << "LU:   " << btm.GetUVLU("grass_block_side").x << "   " << btm.GetUVLU("grass_block_side").y << std::endl;
+    std::cout << "LD:   " << btm.GetUVLD("grass_block_side").x << "   " << btm.GetUVLD("grass_block_side").y << std::endl;
+    std::cout << "RD:   " << btm.GetUVRD("grass_block_side").x << "   " << btm.GetUVRD("grass_block_side").y << std::endl;
+    std::cout << "RU:   " << btm.GetUVRU("grass_block_side").x << "   " << btm.GetUVRU("grass_block_side").y << std::endl;
+    */
+    /*
+    FastNoiseLite gen;
 
+double noise(double nx, double ny) { // if using fastnoiselite
+    // Rescale from -1.0:+1.0 to 0.0:1.0
+    return gen.GetNoise(nx, ny) / 2.0 + 0.5;}
     glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)WND_WIDTH / (float)WND_HEIGHT, 0.1f, 100.0f);
     glm::mat4 view = glm::mat4(1.0f);
 

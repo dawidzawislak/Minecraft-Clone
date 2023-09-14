@@ -5,17 +5,32 @@
 #include "Block.h"
 #include "Texture.h"
 
+struct Pixel
+{
+	int8_t r, g, b, a;
+};
+
 class BlockTextureManager
 {
-	std::unordered_map<BlockType, Texture*> m_tops;
-	std::unordered_map<BlockType, Texture*> m_sides;
-	std::unordered_map<BlockType, Texture*> m_bottoms;
+	static std::unordered_map<std::string, glm::vec2> m_uvLU;
+	static std::unordered_map<std::string, glm::vec2> m_uvRD;
+
+	static std::vector<Pixel> m_data;
+	static unsigned int m_width, m_height, m_bpp;
+
+	static unsigned int m_textureAtlasID;
+
+private:
+	BlockTextureManager() {};
 
 public:
-	bool Initialize(std::string fileNamesTemplate, int count);
-	void Release();
+	static bool Initialize(std::string blockTexturesDir);
+	static void Release();
 
-	void BindSideTexture(BlockType type);
-	void BindTopTexture(BlockType type);
-	void BindBottomTexture(BlockType type);
+	static void BindTextureAtlas(int slot = 0);
+
+	static const glm::vec2& GetUVLU(std::string textureName);
+	static glm::vec2 GetUVLD(std::string textureName);
+	static const glm::vec2& GetUVRD(std::string textureName);
+	static glm::vec2 GetUVRU(std::string textureName);
 };

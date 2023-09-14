@@ -6,11 +6,14 @@
 Game::Game(std::string title, unsigned int width, unsigned int height, bool fullScreen)
 	: m_Window(title, width, height, fullScreen), m_shader("res/shaders/basic.shader"), m_testChunk(0,0)
 {
+	BlockTextureManager::Initialize("res/textures/block");
 	InitializeScene();
 }
 
 Game::~Game()
-{}
+{
+	BlockTextureManager::Release();
+}
 
 void Game::Run()
 {
@@ -27,7 +30,7 @@ void Game::Run()
 
 void Game::InitializeScene()
 {
-	m_Camera.SetCameraPosition(glm::vec3(0.0f, 0, 18.0f));
+	m_Camera.SetCameraPosition(glm::vec3(0.0f, 100.0f, 18.0f));
 	m_projMatrix = glm::perspective(glm::radians(45.0f), (float)m_Window.GetWidth() / (float)m_Window.GetHeight(), 0.1f, 100.0f);
 
 	m_testChunk.Generate();
@@ -40,7 +43,9 @@ void Game::InitializeScene()
 
 	m_ib.SetData(m_testChunk.renderData.indices.data(), m_testChunk.renderData.indices.size());
 
-	m_BlockTextureManager.Initialize("res/textures/tile_.png", 3);
+	BlockTextureManager::BindTextureAtlas(0);
+	m_shader.Bind();
+	m_shader.SetUniform1i("u_Texture", 0);
 
 	GLCall(glEnable(GL_DEPTH_TEST));
 	Input::SetCameraBinding(&m_Camera);
@@ -74,9 +79,6 @@ void Game::Draw()
 	m_Renderer.Clear();
 
 	m_va.Bind();
-	m_shader.Bind();
-	m_BlockTextureManager.BindSideTexture(BlockType::GRASS);
-	m_shader.SetUniform1i("u_Texture", 0);
 	glm::mat4 mvp = m_projMatrix * m_Camera.GetViewMatrix();
 	m_shader.SetUniformMat4f("u_MVP", mvp);
 	m_ib.Bind();

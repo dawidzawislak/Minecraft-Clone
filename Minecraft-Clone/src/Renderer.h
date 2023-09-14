@@ -19,7 +19,7 @@ bool GLLogCall(const char* function, const char* file, int line);
 
 class Renderer
 {
-	BlockTextureManager m_blockTextureManager;
+	//BlockTextureManager m_blockTextureManager;
 	VertexArray m_cubeVA;
 	IndexBuffer m_cubeFrontIB;
 	IndexBuffer m_cubeBackIB;

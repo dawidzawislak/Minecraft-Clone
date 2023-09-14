@@ -86,7 +86,7 @@ Renderer::Renderer()
     m_cubeLeftIB.SetData(indicesLeft, 6);
     m_cubeRightIB.SetData(indicesRight, 6);
 
-    m_blockTextureManager.Initialize("res/textures/tile_.png", 3);
+    //m_blockTextureManager.Initialize("res/textures/tile_.png", 3);
 
 
     GLCall(glEnable(GL_CULL_FACE));
@@ -95,7 +95,7 @@ Renderer::Renderer()
 
 Renderer::~Renderer()
 {
-    m_blockTextureManager.Release();
+    //m_blockTextureManager.Release();
 }
 
 void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
@@ -120,11 +120,11 @@ void Renderer::DrawBlocks(const std::vector<Block>& blocks, const glm::mat4& vp)
         glm::mat4 mvp = vp * model;
         m_blockShader.SetUniformMat4f("u_MVP", mvp);
 
-        m_blockTextureManager.BindTopTexture(block.GetType());
+        //m_blockTextureManager.BindTopTexture(block.GetType());
         m_cubeUpIB.Bind();
         GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 
-        m_blockTextureManager.BindSideTexture(block.GetType());
+       // m_blockTextureManager.BindSideTexture(block.GetType());
         m_cubeFrontIB.Bind();
         GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
         m_cubeRightIB.Bind();
@@ -134,7 +134,7 @@ void Renderer::DrawBlocks(const std::vector<Block>& blocks, const glm::mat4& vp)
         m_cubeLeftIB.Bind();
         GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 
-        m_blockTextureManager.BindBottomTexture(block.GetType());
+        //m_blockTextureManager.BindBottomTexture(block.GetType());
         m_cubeBottomIB.Bind();
         GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
     }

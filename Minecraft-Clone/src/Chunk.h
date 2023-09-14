@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Block.h"
+#include "BlockTextureManager.h"
 #include <unordered_map>
 
 struct UVVertex
