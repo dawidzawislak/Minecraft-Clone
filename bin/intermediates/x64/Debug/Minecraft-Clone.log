@@ -1,2 +1,3 @@
-﻿  Main.cpp
+﻿  Chunk.cpp
+C:\dev\Minecraft-Clone\Minecraft-Clone\src\Chunk.cpp(230,51): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
   Minecraft-Clone.vcxproj -> C:\dev\Minecraft-Clone\bin\x64\Debug\Minecraft-Clone.exe

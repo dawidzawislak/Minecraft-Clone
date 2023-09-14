@@ -11,9 +11,6 @@ private:
 	Window m_Window;
 
 	Camera m_Camera;
-	float m_lastX;
-	float m_lastY;
-	bool m_firstMouse = true;
 
 	Renderer m_Renderer;
 
@@ -21,6 +18,18 @@ private:
 	float m_lastFrame = 0.0f;
 
 	FastNoiseLite m_NoiseGen;
+
+	BlockTextureManager m_BlockTextureManager;
+
+	Chunk m_testChunk;
+	int noIndices;
+
+	VertexBuffer m_vb;
+	VertexArray m_va;
+	IndexBuffer m_ib;
+	Shader m_shader;
+
+	glm::mat4 m_projMatrix;
 
 public:
 	Game(std::string title, unsigned int width, unsigned int height, bool fullScreen = false);

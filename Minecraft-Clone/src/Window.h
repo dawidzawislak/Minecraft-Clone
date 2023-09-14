@@ -19,6 +19,9 @@ public:
 	bool IsFullScreen();
 	GLFWwindow** GetGLFWWindow() { return &m_window; }
 
+	unsigned int GetWidth() const { return m_wndWidth; }
+	unsigned int GetHeight() const { return m_wndHeight; }
+
 	void SetFullScreen(bool flag);
 	void ToggleFullScreen();
 

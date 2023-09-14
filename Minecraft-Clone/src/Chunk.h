@@ -3,25 +3,32 @@
 #include "Block.h"
 #include <unordered_map>
 
+struct UVVertex
+{
+	glm::vec3 pos;
+	glm::vec2 uvs;
+};
 
+struct ChunkRenderData
+{
+	std::vector<UVVertex> vertices;
+	std::vector<uint32_t> indices;
+};
 
 class Chunk
 {
+public:
+	int16_t* blocks;
+
+	ChunkRenderData renderData;
+
 private:
-	BlockType m_blocks[16][16][256];
-	std::unordered_map<std::string, int> m_blocksToRender;
-	int m_xPos, m_zPos;
+	int m_posX;
+	int m_posZ;
 
 public:
-	Chunk(int x, int y, float* heights);
-	Chunk() {};
+	Chunk(int posX, int posZ);
 	~Chunk();
 
-
-	void Initialize(int x, int y, float* heights);
-	void Update(Chunk* xmin1Chunk, const Chunk* xplus1Chunk, Chunk* zmin1Chunk, const Chunk* zplus1Chunk);
-
-	BlockType GetBlockType(unsigned int x, unsigned int y, unsigned int z) const { return m_blocks[x][z][y]; }
-	const std::unordered_map<std::string, int>& BlocksToRender() const { return m_blocksToRender; }
-	glm::vec3 GetPosVec3() const { return glm::vec3(m_xPos, -256.0f, m_zPos); }
+	void Generate();
 };

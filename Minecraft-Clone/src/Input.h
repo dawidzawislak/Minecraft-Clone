@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Window.h"
+#include "Camera.h"
 
 class Input
 {
@@ -8,6 +9,8 @@ class Input
 	static double m_mouseX, m_mouseY;
 	static double m_mouseXLast, m_mouseYLast;
 	static double m_scrollOffset;
+
+	static Camera* m_camera;
 
 	static double m_mouseXOffset, m_mouseYOffset;
 
@@ -28,6 +31,5 @@ public:
 	static double GetMousePosX() { return m_mouseX; };
 	static double GetMousePosY() { return m_mouseY; };
 
-	static double GetMousePosXOffset() { return m_mouseXOffset; };
-	static double GetMousePosYOffset() { return m_mouseYOffset; };
+	static void SetCameraBinding(Camera* camera) { m_camera = camera; };
 };

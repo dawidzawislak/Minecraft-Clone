@@ -8,7 +8,7 @@
 Shader::Shader(const std::string& filePath)
 	:m_filePath(filePath), m_id(0u)
 {
-    ShaderProgramSource source = ParseShader("res/shaders/basic.shader");
+    ShaderProgramSource source = ParseShader(m_filePath);
     m_id = CreateShader(source);
 }
 
@@ -51,8 +51,7 @@ unsigned int Shader::CompileShader(const std::string& source, unsigned int type)
 
     int result;
     GLCall(glGetShaderiv(id, GL_COMPILE_STATUS, &result));
-    if (result == GL_FALSE)
-    {
+    if (result == GL_FALSE) {
         int length;
         GLCall(glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length));
         char* message = new char[length];
@@ -83,6 +82,10 @@ unsigned int Shader::GetUniformLocation(const std::string& name)
 ShaderProgramSource Shader::ParseShader(const std::string& filePath)
 {
     std::ifstream stream(filePath);
+    if (stream.fail()) {
+        std::cout << "Failed to open: " << filePath << std::endl;
+        return { "", "" };
+    }
 
     enum class ShaderType {
         NONE = -1,
@@ -118,8 +121,24 @@ unsigned int Shader::CreateShader(ShaderProgramSource source)
     GLCall(glAttachShader(program, vs));
     GLCall(glAttachShader(program, fs));
     GLCall(glLinkProgram(program));
-    GLCall(glValidateProgram(program));
 
+    int result;
+    GLCall(glGetProgramiv(program, GL_LINK_STATUS, &result));
+    if (result == GL_FALSE) {
+        int length;
+        GLCall(glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length));
+        char* message = new char[length];
+
+        GLCall(glGetProgramInfoLog(program, length, &length, message));
+        std::cout << "Failed to link shaders!" << std::endl;
+        std::cout << message << std::endl;
+        GLCall(glDeleteProgram(program));
+        delete[] message;
+        return 0;
+
+    }
+    GLCall(glDetachShader(program, vs));
+    GLCall(glDetachShader(program, fs));
     GLCall(glDeleteShader(vs));
     GLCall(glDeleteShader(fs));
 

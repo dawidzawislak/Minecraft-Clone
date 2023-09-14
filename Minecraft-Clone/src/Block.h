@@ -4,7 +4,7 @@
 
 enum class BlockType
 {
-	AIR,
+	AIR = 0,
 	GRASS,
 	DIRT,
 	STONE

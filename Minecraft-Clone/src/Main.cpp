@@ -4,6 +4,8 @@
 #include "Shader.h"
 #include "Texture.h"
 
+#include <iostream>
+
 
 FastNoiseLite gen;
 
@@ -14,7 +16,7 @@ double noise(double nx, double ny) { // if using fastnoiselite
 
 int main()
 {
-    Game game("title", 1280, 720);
+    Game game("Minecraft Clone", 1280, 720);
     game.Run();
 
     /*

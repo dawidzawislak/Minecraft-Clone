@@ -12,6 +12,8 @@ double Input::m_mouseYOffset = 0.0;
 double Input::m_mouseXLast = 0.0;
 double Input::m_mouseYLast = 0.0;
 
+Camera* Input::m_camera = nullptr;
+
 bool Input::m_firstMouse = true;
 
 void Input::InitializeInputClass(Window* window)
@@ -24,21 +26,20 @@ void Input::MouseMoveCallback(GLFWwindow* window, double xPos, double yPos)
 	m_mouseX = xPos;
 	m_mouseY = yPos;
 
-	float fxPos = static_cast<float>(xPos);
-	float fyPos = static_cast<float>(yPos);
-
-	if (Input::m_firstMouse)
+	if (m_firstMouse)
 	{
-		m_mouseXLast = fxPos;
-		m_mouseYLast = fyPos;
+		m_mouseXLast = m_mouseX;
+		m_mouseYLast = m_mouseY;
 		m_firstMouse = false;
 	}
 
-	m_mouseXOffset = fxPos - m_mouseXLast;
-	m_mouseYOffset = m_mouseYLast - fyPos; // reversed since y-coordinates go from bottom to top
+	m_mouseXOffset = m_mouseX - m_mouseXLast;
+	m_mouseYOffset = m_mouseYLast - m_mouseY; // reversed since y-coordinates go from bottom to top
 
-	m_mouseXLast = fxPos;
-	m_mouseYLast = fyPos;
+	m_camera->ProcessMouseMovement(m_mouseXOffset, m_mouseYOffset);
+
+	m_mouseXLast = m_mouseX;
+	m_mouseYLast = m_mouseY;
 }
 
 void Input::MouseScrollCallback(GLFWwindow* window, double xOffset, double yOffset)

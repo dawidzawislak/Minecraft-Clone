@@ -12,8 +12,8 @@ Window::Window(std::string title, unsigned int width, unsigned int height, bool 
 		__debugbreak();
 	}
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	m_window = glfwCreateWindow(m_wndWidth, m_wndHeight, m_wndTitle.c_str(), nullptr, nullptr);
@@ -35,6 +35,7 @@ Window::Window(std::string title, unsigned int width, unsigned int height, bool 
 	}
 
 	glViewport(0, 0, m_wndWidth, m_wndHeight);	
+	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	Input::InitializeInputClass(this);
 	glfwSetFramebufferSizeCallback(m_window, FramebufferSizeCallback);

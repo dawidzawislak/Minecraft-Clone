@@ -157,6 +157,7 @@ const std::vector<std::string> explode(const std::string& s, const char& c)
 
 void Renderer::DrawChunks(Chunk* chunks, int cntX, int cntY, const glm::mat4& vp)
 {
+    /*
     m_blockShader.Bind();
     m_cubeVA.Bind();
     m_blockShader.SetUniform1i("u_Texture", 0);
@@ -215,6 +216,7 @@ void Renderer::DrawChunks(Chunk* chunks, int cntX, int cntY, const glm::mat4& vp
             }
         }
     }
+    */
 }
 
 void Renderer::Clear() const

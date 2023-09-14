@@ -1,10 +1,13 @@
 #include "Game.h"
 
 #include "Input.h"
+#include <iostream>
 
 Game::Game(std::string title, unsigned int width, unsigned int height, bool fullScreen)
-	: m_Window(title, width, height, fullScreen)
-{}
+	: m_Window(title, width, height, fullScreen), m_shader("res/shaders/basic.shader"), m_testChunk(0,0)
+{
+	InitializeScene();
+}
 
 Game::~Game()
 {}
@@ -24,7 +27,23 @@ void Game::Run()
 
 void Game::InitializeScene()
 {
-	m_Camera.SetCameraPosition(glm::vec3(0.0f, 0.0f, 2.0f));
+	m_Camera.SetCameraPosition(glm::vec3(0.0f, 0, 18.0f));
+	m_projMatrix = glm::perspective(glm::radians(45.0f), (float)m_Window.GetWidth() / (float)m_Window.GetHeight(), 0.1f, 100.0f);
+
+	m_testChunk.Generate();
+
+	m_vb.SetData(m_testChunk.renderData.vertices.data(), m_testChunk.renderData.vertices.size()*sizeof(UVVertex));
+	VertexBufferLayout layout;
+	layout.Push<float>(3);
+	layout.Push<float>(2);
+	m_va.AddBuffer(m_vb, layout);
+
+	m_ib.SetData(m_testChunk.renderData.indices.data(), m_testChunk.renderData.indices.size());
+
+	m_BlockTextureManager.Initialize("res/textures/tile_.png", 3);
+
+	GLCall(glEnable(GL_DEPTH_TEST));
+	Input::SetCameraBinding(&m_Camera);
 }
 
 void Game::Update()
@@ -48,13 +67,18 @@ void Game::Update()
 	if (Input::IsKeyPressed(GLFW_KEY_LEFT_SHIFT))
 		m_Camera.ProcessKeyboard(Direction::DOWN, m_deltaTime);
 
-	m_Camera.ProcessMouseMovement(Input::GetMousePosXOffset(), Input::GetMousePosYOffset());
-
 	// Calculations
 }
 void Game::Draw()
 {
 	m_Renderer.Clear();
 
-	// Draw Stuff
+	m_va.Bind();
+	m_shader.Bind();
+	m_BlockTextureManager.BindSideTexture(BlockType::GRASS);
+	m_shader.SetUniform1i("u_Texture", 0);
+	glm::mat4 mvp = m_projMatrix * m_Camera.GetViewMatrix();
+	m_shader.SetUniformMat4f("u_MVP", mvp);
+	m_ib.Bind();
+	GLCall(glDrawElements(GL_TRIANGLES, m_testChunk.renderData.indices.size(), GL_UNSIGNED_INT, 0));
 }
