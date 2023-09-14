@@ -1,8 +1,7 @@
 #pragma once
 
-#include "Block.h"
-#include "BlockTextureManager.h"
-#include <unordered_map>
+#include <vector>
+#include "glm/glm.hpp"
 
 struct UVVertex
 {

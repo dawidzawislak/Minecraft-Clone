@@ -1,4 +1,6 @@
 #include "Chunk.h"
+#include "BlocksDB.h"
+#include "BlockTextureManager.h"
 
 constexpr int CHUNK_WIDTH = 16;
 constexpr int CHUNK_HEIGHT = 256;
@@ -16,7 +18,13 @@ Chunk::Chunk(int posX, int posZ)
 	m_posZ = posZ;
 
 	blocks = new int16_t[CHUNK_VOLUME];
-	memset(blocks, 1, sizeof(int16_t) * CHUNK_VOLUME);
+	memset(blocks, 0, sizeof(int16_t) * CHUNK_VOLUME);
+
+	for (int x = 0; x < CHUNK_WIDTH; x++)
+		for (int z = 0; z < CHUNK_DPETH; z++)
+			for (int y = 0; y < CHUNK_HEIGHT; y++)
+				if (y >= 30) blocks[GetXYZIndex(x, y, z)] = (int16_t)BlockType::GRASS;
+				else blocks[GetXYZIndex(x, y, z)] = (int16_t)BlockType::SAND;
 }
 
 Chunk::~Chunk()
@@ -32,6 +40,35 @@ void PushIndices(int vertOffset, std::vector<uint32_t>& indices)
 	indices.push_back(vertOffset + 1);
 	indices.push_back(vertOffset + 2);
 	indices.push_back(vertOffset + 3);
+}
+
+enum Side
+{
+	TOP,
+	SIDE,
+	BOTTOM
+};
+
+void SetUVs(UVVertex* uvs, BlockType blockID, Side side)
+{
+	std::string texName = "";
+	switch (side)
+	{
+	case TOP:
+		texName = BlocksDB::GetTextures(blockID).top;
+		break;
+	case SIDE:
+		texName = BlocksDB::GetTextures(blockID).side;
+		break;
+	case BOTTOM:
+		texName = BlocksDB::GetTextures(blockID).bottom;
+		break;
+	}
+
+	uvs[0].uvs = BlockTextureManager::GetUVLU(texName);
+	uvs[1].uvs = BlockTextureManager::GetUVLD(texName);
+	uvs[2].uvs = BlockTextureManager::GetUVRD(texName);
+	uvs[3].uvs = BlockTextureManager::GetUVRU(texName);
 }
 
 void Chunk::Generate()
@@ -54,10 +91,6 @@ void Chunk::Generate()
 			for (int z = 0; z < CHUNK_DPETH; z++) {
 				glm::vec3 offset(x, y, z);
 				UVVertex faceVerts[4];
-				faceVerts[0].uvs = BlockTextureManager::GetUVLU("grass_block_side");// { 0, 1 };
-				faceVerts[1].uvs = BlockTextureManager::GetUVLD("grass_block_side");//{ 0,0 };
-				faceVerts[2].uvs = BlockTextureManager::GetUVRD("grass_block_side");//{ 1,0 };
-				faceVerts[3].uvs = BlockTextureManager::GetUVRU("grass_block_side");//{ 1,1 };
 				int indicesOffset = renderData.vertices.size();
 
 				// Front Face
@@ -66,7 +99,7 @@ void Chunk::Generate()
 					faceVerts[1].pos = cubeVerts[1] + chunkOrigin + offset;
 					faceVerts[2].pos = cubeVerts[2] + chunkOrigin + offset;
 					faceVerts[3].pos = cubeVerts[3] + chunkOrigin + offset;
-
+					SetUVs(faceVerts, (BlockType)blocks[GetXYZIndex(x, y, z)], SIDE);
 					for (const UVVertex& v : faceVerts)
 						renderData.vertices.push_back(v);
 
@@ -79,7 +112,7 @@ void Chunk::Generate()
 					faceVerts[1].pos = cubeVerts[6] + chunkOrigin + offset;
 					faceVerts[2].pos = cubeVerts[5] + chunkOrigin + offset;
 					faceVerts[3].pos = cubeVerts[4] + chunkOrigin + offset;
-
+					SetUVs(faceVerts, (BlockType)blocks[GetXYZIndex(x, y, z)], SIDE);
 					for (const UVVertex& v : faceVerts)
 						renderData.vertices.push_back(v);
 
@@ -93,7 +126,7 @@ void Chunk::Generate()
 					faceVerts[1].pos = cubeVerts[5] + chunkOrigin + offset;
 					faceVerts[2].pos = cubeVerts[1] + chunkOrigin + offset;
 					faceVerts[3].pos = cubeVerts[0] + chunkOrigin + offset;
-
+					SetUVs(faceVerts, (BlockType)blocks[GetXYZIndex(x, y, z)], SIDE);
 					for (const UVVertex& v : faceVerts)
 						renderData.vertices.push_back(v);
 
@@ -106,7 +139,7 @@ void Chunk::Generate()
 					faceVerts[1].pos = cubeVerts[2] + chunkOrigin + offset;
 					faceVerts[2].pos = cubeVerts[6] + chunkOrigin + offset;
 					faceVerts[3].pos = cubeVerts[7] + chunkOrigin + offset;
-
+					SetUVs(faceVerts, (BlockType)blocks[GetXYZIndex(x, y, z)], SIDE);
 					for (const UVVertex& v : faceVerts)
 						renderData.vertices.push_back(v);
 
@@ -120,7 +153,7 @@ void Chunk::Generate()
 					faceVerts[1].pos = cubeVerts[0] + chunkOrigin + offset;
 					faceVerts[2].pos = cubeVerts[3] + chunkOrigin + offset;
 					faceVerts[3].pos = cubeVerts[7] + chunkOrigin + offset;
-
+					SetUVs(faceVerts, (BlockType)blocks[GetXYZIndex(x, y, z)], TOP);
 					for (const UVVertex& v : faceVerts)
 						renderData.vertices.push_back(v);
 
@@ -134,7 +167,7 @@ void Chunk::Generate()
 					faceVerts[1].pos = cubeVerts[5] + chunkOrigin + offset;
 					faceVerts[2].pos = cubeVerts[6] + chunkOrigin + offset;
 					faceVerts[3].pos = cubeVerts[2] + chunkOrigin + offset;
-
+					SetUVs(faceVerts, (BlockType)blocks[GetXYZIndex(x, y, z)], BOTTOM);
 					for (const UVVertex& v : faceVerts)
 						renderData.vertices.push_back(v);
 

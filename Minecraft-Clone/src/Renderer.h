@@ -6,7 +6,6 @@
 #include "Shader.h"
 #include "VertexArray.h"
 #include "IndexBuffer.h"
-#include "Block.h"
 #include "BlockTextureManager.h"
 #include "Chunk.h"
 
@@ -38,8 +37,6 @@ public:
 	~Renderer();
 
 	void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
-
-	void DrawBlocks(const std::vector<Block>& blocks, const glm::mat4& vp);
 
 	void DrawChunks(Chunk* chunks, int cntX, int cntY, const glm::mat4& vp);
 

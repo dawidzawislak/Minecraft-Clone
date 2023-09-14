@@ -1,9 +1,8 @@
 #pragma once
 
 #include <unordered_map>
-
-#include "Block.h"
-#include "Texture.h"
+#include "BlocksDB.h"
+#include <glm/glm.hpp>
 
 struct Pixel
 {

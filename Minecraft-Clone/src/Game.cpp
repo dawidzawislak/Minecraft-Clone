@@ -3,10 +3,14 @@
 #include "Input.h"
 #include <iostream>
 
+#include "BlocksDB.h"
+
 Game::Game(std::string title, unsigned int width, unsigned int height, bool fullScreen)
 	: m_Window(title, width, height, fullScreen), m_shader("res/shaders/basic.shader"), m_testChunk(0,0)
 {
 	BlockTextureManager::Initialize("res/textures/block");
+	BlocksDB::Initialize();
+
 	InitializeScene();
 }
 
@@ -30,7 +34,7 @@ void Game::Run()
 
 void Game::InitializeScene()
 {
-	m_Camera.SetCameraPosition(glm::vec3(0.0f, 100.0f, 18.0f));
+	m_Camera.SetCameraPosition(glm::vec3(0.0f, 0, 18.0f));
 	m_projMatrix = glm::perspective(glm::radians(45.0f), (float)m_Window.GetWidth() / (float)m_Window.GetHeight(), 0.1f, 100.0f);
 
 	m_testChunk.Generate();

@@ -63,6 +63,9 @@
     <ClCompile Include="src\vendor\stb_image\stb_image_write.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\BlocksDB.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\basic.shader" />
@@ -1350,7 +1353,7 @@
     <ClInclude Include="src\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Block.h">
+    <ClInclude Include="src\BlocksDB.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\BlockTextureManager.h">

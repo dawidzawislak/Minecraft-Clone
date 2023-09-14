@@ -7,6 +7,7 @@
 #include <vector>
 #include <iostream>
 #include <filesystem>
+
 namespace fs = std::filesystem;
 
 std::unordered_map<std::string, glm::vec2> BlockTextureManager::m_uvLU;
