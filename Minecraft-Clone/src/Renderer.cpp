@@ -18,7 +18,7 @@ bool GLLogCall(const char* function, const char* file, int line)
 }
 
 Renderer::Renderer()
-    :m_blockShader("res/shaders/basic.shader")
+    :m_blockShader("res/shaders/white.shader")
 {
     float vertices[] = {
         // front
@@ -88,9 +88,9 @@ Renderer::Renderer()
 
     //m_blockTextureManager.Initialize("res/textures/tile_.png", 3);
 
-
     GLCall(glEnable(GL_CULL_FACE));
     GLCall(glCullFace(GL_BACK));
+    GLCall(glEnable(GL_DEPTH_TEST));
 }
 
 Renderer::~Renderer()

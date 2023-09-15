@@ -1,12 +1,5 @@
-﻿  Chunk.cpp
-C:\dev\Minecraft-Clone\Minecraft-Clone\src\Chunk.cpp(96,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\dev\Minecraft-Clone\Minecraft-Clone\src\Chunk.cpp(97,10): warning C4552: '*': result of expression not used
-C:\dev\Minecraft-Clone\Minecraft-Clone\src\Chunk.cpp(98,10): warning C4552: '*': result of expression not used
-C:\dev\Minecraft-Clone\Minecraft-Clone\src\Chunk.cpp(99,22): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\dev\Minecraft-Clone\Minecraft-Clone\src\Chunk.cpp(118,51): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-  Game.cpp
-C:\dev\Minecraft-Clone\Minecraft-Clone\src\Game.cpp(43,141): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\dev\Minecraft-Clone\Minecraft-Clone\src\Game.cpp(49,120): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\dev\Minecraft-Clone\Minecraft-Clone\src\Game.cpp(93,4): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-  Generating Code...
+﻿  Game.cpp
+C:\dev\Minecraft-Clone\Minecraft-Clone\src\Game.cpp(50,141): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\dev\Minecraft-Clone\Minecraft-Clone\src\Game.cpp(52,120): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\dev\Minecraft-Clone\Minecraft-Clone\src\Game.cpp(96,4): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
   Minecraft-Clone.vcxproj -> C:\dev\Minecraft-Clone\bin\x64\Debug\Minecraft-Clone.exe

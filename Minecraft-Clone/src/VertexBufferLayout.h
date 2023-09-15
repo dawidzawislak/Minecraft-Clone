@@ -18,6 +18,8 @@ struct VertexBufferElement
 				return 4;
 			case GL_UNSIGNED_BYTE:
 				return 1;
+			case GL_UNSIGNED_SHORT:
+				return 2;
 		}
 		__debugbreak();
 		return 0;
@@ -48,17 +50,24 @@ public:
 	}
 
 	template<>
-	void Push<unsigned int>(unsigned int count)
+	void Push<uint32_t>(unsigned int count)
 	{
 		m_elements.push_back({ GL_UNSIGNED_INT, count, GL_FALSE });
 		m_stride += VertexBufferElement::GetSizeOfType(GL_UNSIGNED_INT) * count;
 	}
 
 	template<>
-	void Push<unsigned char>(unsigned int count)
+	void Push<uint8_t>(unsigned int count)
 	{
-		m_elements.push_back({ GL_UNSIGNED_BYTE, count, GL_TRUE });
+		m_elements.push_back({ GL_UNSIGNED_BYTE, count, GL_FALSE });
 		m_stride += VertexBufferElement::GetSizeOfType(GL_UNSIGNED_BYTE) * count;
+	}
+
+	template<>
+	void Push<uint16_t>(unsigned int count)
+	{
+		m_elements.push_back({ GL_UNSIGNED_SHORT, count, GL_FALSE });
+		m_stride += VertexBufferElement::GetSizeOfType(GL_UNSIGNED_SHORT) * count;
 	}
 
 	const std::vector<VertexBufferElement>& GetElements() const { return m_elements; }

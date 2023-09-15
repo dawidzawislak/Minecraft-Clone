@@ -174,7 +174,7 @@
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\shaders\basic.shader" />
+    <None Include="res\shaders\default.shader" />
     <None Include="res\shaders\white.shader" />
     <None Include="src\vendor\glm\detail\func_common.inl" />
     <None Include="src\vendor\glm\detail\func_common_simd.inl" />

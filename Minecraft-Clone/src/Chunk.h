@@ -8,6 +8,7 @@ struct UVVertex
 {
 	glm::vec3 pos;
 	glm::vec2 uvs;
+	uint32_t face;
 };
 
 struct ChunkRenderData

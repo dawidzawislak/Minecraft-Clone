@@ -25,9 +25,13 @@ public:
 	void Bind() const;
 	void Unbind() const;
 
+	void SetUniform3f(const std::string& name, float v1, float v2, float v3);
 	void SetUniform4f(const std::string& name, float v1, float v2, float v3, float v4);
+
 	void SetUniform1i(const std::string& name, int value);
 	void SetUniformMat4f(const std::string& name, glm::mat4& matrix);
+
+	
 
 private:
 	unsigned int CompileShader(const std::string& source, unsigned int type);

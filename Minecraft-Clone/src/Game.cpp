@@ -6,10 +6,12 @@
 #include "BlocksDB.h"
 
 Game::Game(std::string title, unsigned int width, unsigned int height, bool fullScreen)
-	: m_Window(title, width, height, fullScreen), m_shader("res/shaders/basic.shader")
+	: m_Window(title, width, height, fullScreen), m_shader("res/shaders/default.shader")
 {
 	BlockTextureManager::Initialize("res/textures/block");
 	BlocksDB::Initialize();
+	Input::SetCameraBinding(&m_Camera);
+
 	InitializeScene();
 }
 
@@ -36,26 +38,25 @@ void Game::InitializeScene()
 	m_Camera.SetCameraPosition(glm::vec3(0.0f, 128.0f, 4*16.0f + 2.0f));
 	m_projMatrix = glm::perspective(glm::radians(45.0f), (float)m_Window.GetWidth() / (float)m_Window.GetHeight(), 0.1f, 200.0f);
 
+	VertexBufferLayout layout;
+	layout.Push<float>(3);
+	layout.Push<float>(2);
+	layout.Push<uint32_t>(1);
+
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
-			m_chunks[j  * 8 + i].Generate(i-4, j-4, 123);
+			m_chunks[j  * 8 + i].Generate(i-4, j-4, 1234);
 
 			m_vb[j * 8 + i].SetData(m_chunks[j * 8 + i].renderData.vertices.data(), m_chunks[j * 8 + i].renderData.vertices.size() * sizeof(UVVertex));
-			VertexBufferLayout layout;
-			layout.Push<float>(3);
-			layout.Push<float>(2);
 			m_va[j * 8 + i].AddBuffer(m_vb[j * 8 + i], layout);
-
 			m_ib[j * 8 + i].SetData(m_chunks[j * 8 + i].renderData.indices.data(), m_chunks[j * 8 + i].renderData.indices.size());
-
 		}
 	}
+
 	BlockTextureManager::BindTextureAtlas(0);
 	m_shader.Bind();
-	m_shader.SetUniform1i("u_Texture", 0);
-
-	GLCall(glEnable(GL_DEPTH_TEST));
-	Input::SetCameraBinding(&m_Camera);
+	m_shader.SetUniform1i("uTexture", 0);
+	m_shader.SetUniform3f("uSunPosition", 100.0f, 300.0f, 100.0f);
 }
 
 void Game::Update()
@@ -83,8 +84,10 @@ void Game::Update()
 }
 void Game::Draw()
 {
-	glm::mat4 mvp = m_projMatrix * m_Camera.GetViewMatrix();
-	m_shader.SetUniformMat4f("u_MVP", mvp);
+	glm::mat4 viewMat = m_Camera.GetViewMatrix();
+	m_shader.SetUniformMat4f("uProjMat", m_projMatrix);
+	m_shader.SetUniformMat4f("uViewMat", viewMat);
+
 	m_Renderer.Clear();
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {

@@ -5,8 +5,10 @@
 enum class BlockType
 {
 	AIR = 0,
-	GRASS = 1,
-	SAND = 2
+	GRASS,
+	DIRT,
+	STONE,
+	SAND
 };
 
 struct TextureNames
