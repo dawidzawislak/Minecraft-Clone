@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "glm/glm.hpp"
+#include "FastNoiseLite/FastNoiseLite.h"
 
 struct UVVertex
 {
@@ -22,13 +23,15 @@ public:
 
 	ChunkRenderData renderData;
 
+	static FastNoiseLite gen;
+
 private:
 	int m_posX;
 	int m_posZ;
 
 public:
-	Chunk(int posX, int posZ);
+	Chunk();
 	~Chunk();
 
-	void Generate();
+	void Generate(int posX, int posZ, int seed);
 };

@@ -1,30 +1,24 @@
 #include "Chunk.h"
 #include "BlocksDB.h"
 #include "BlockTextureManager.h"
+#include <iostream>
 
 constexpr int CHUNK_WIDTH = 16;
 constexpr int CHUNK_HEIGHT = 256;
 constexpr int CHUNK_DPETH = 16;
 constexpr int CHUNK_VOLUME = CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DPETH;
 
+FastNoiseLite Chunk::gen;
+
 int GetXYZIndex(int x, int y, int z)
 {
 	return x + CHUNK_WIDTH * (y + CHUNK_HEIGHT * z);
 }
 
-Chunk::Chunk(int posX, int posZ)
+Chunk::Chunk()
 {
-	m_posX = posX;
-	m_posZ = posZ;
-
 	blocks = new int16_t[CHUNK_VOLUME];
 	memset(blocks, 0, sizeof(int16_t) * CHUNK_VOLUME);
-
-	for (int x = 0; x < CHUNK_WIDTH; x++)
-		for (int z = 0; z < CHUNK_DPETH; z++)
-			for (int y = 0; y < CHUNK_HEIGHT; y++)
-				if (y >= 30) blocks[GetXYZIndex(x, y, z)] = (int16_t)BlockType::GRASS;
-				else blocks[GetXYZIndex(x, y, z)] = (int16_t)BlockType::SAND;
 }
 
 Chunk::~Chunk()
@@ -71,8 +65,16 @@ void SetUVs(UVVertex* uvs, BlockType blockID, Side side)
 	uvs[3].uvs = BlockTextureManager::GetUVRU(texName);
 }
 
-void Chunk::Generate()
+double noise(double nx, double ny) 
+{ 
+	return Chunk::gen.GetNoise(nx, ny) / 2.0 + 0.5;
+}
+
+void Chunk::Generate(int posX, int posZ, int seed)
 {
+	m_posX = posX;
+	m_posZ = posZ;
+
 	glm::vec3 chunkOrigin(m_posX * 16, 0, m_posZ * 16);
 
 	glm::vec3 cubeVerts[8];
@@ -87,8 +89,30 @@ void Chunk::Generate()
 	cubeVerts[7] = glm::vec3(1.0f, 1.0f, -1.0f); // bul
 
 	for (int x = 0; x < CHUNK_WIDTH; x++) {
-		for (int y = 0; y < CHUNK_HEIGHT; y++) {
-			for (int z = 0; z < CHUNK_DPETH; z++) {
+		for (int z = 0; z < CHUNK_DPETH; z++) {
+			for (int y = 0; y < CHUNK_HEIGHT; y++) {
+				int xGlobal = x + m_posX * 16 + seed;
+				int zGlobal = z + m_posZ * 16 + seed;
+				float e = 1 * noise(0.5 * xGlobal, 0.5 * zGlobal);
+				+0.5 * noise(1 * xGlobal, 1 * zGlobal);
+				+0.5 * noise(2 * xGlobal, 2 * zGlobal);
+				float fMaxHeight = e / (2.0) * 255;
+
+				int maxHeight = (int)fMaxHeight;
+
+				if (y == maxHeight)
+					blocks[GetXYZIndex(x, y, z)] = (int16_t)BlockType::GRASS;
+
+				else if (y < maxHeight)
+					blocks[GetXYZIndex(x, y, z)] = (int16_t)BlockType::SAND;
+			}
+		}
+	}
+
+	for (int x = 0; x < CHUNK_WIDTH; x++) {
+		for (int z = 0; z < CHUNK_DPETH; z++) {
+			for (int y = 0; y < CHUNK_HEIGHT; y++) {
+				if (blocks[GetXYZIndex(x, y, z)] == 0) continue;
 				glm::vec3 offset(x, y, z);
 				UVVertex faceVerts[4];
 				int indicesOffset = renderData.vertices.size();

@@ -19,12 +19,12 @@ private:
 
 	FastNoiseLite m_NoiseGen;
 
-	Chunk m_testChunk;
+	Chunk m_chunks[64];
 	int noIndices;
 
-	VertexBuffer m_vb;
-	VertexArray m_va;
-	IndexBuffer m_ib;
+	VertexBuffer m_vb[64];
+	VertexArray m_va[64];
+	IndexBuffer m_ib[64];
 	Shader m_shader;
 
 	glm::mat4 m_projMatrix;
