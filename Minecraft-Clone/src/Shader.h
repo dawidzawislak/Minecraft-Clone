@@ -28,6 +28,8 @@ public:
 	void SetUniform3f(const std::string& name, float v1, float v2, float v3);
 	void SetUniform4f(const std::string& name, float v1, float v2, float v3, float v4);
 
+	void SetUniform2i(const std::string& name, int v1, int v2);
+
 	void SetUniform1i(const std::string& name, int value);
 	void SetUniformMat4f(const std::string& name, glm::mat4& matrix);
 

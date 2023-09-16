@@ -73,6 +73,12 @@ void Window::ToggleFullScreen()
 	SetFullScreen(!IsFullScreen());
 }
 
+void Window::SetWindowTitle(const std::string& title)
+{
+	m_wndTitle = title;
+	glfwSetWindowTitle(m_window, title.c_str());
+}
+
 void Window::FramebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);

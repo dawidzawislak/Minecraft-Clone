@@ -6,9 +6,8 @@
 
 struct UVVertex
 {
-	glm::vec3 pos;
-	glm::vec2 uvs;
-	uint32_t face;
+	uint32_t data1; // position(17bits), blockFace(3bits), textureID(12bits)
+	uint32_t data2; // whichVertex(on face - 2bits)
 };
 
 struct ChunkRenderData
@@ -35,4 +34,6 @@ public:
 	~Chunk();
 
 	void Generate(int posX, int posZ, int seed);
+
+	glm::ivec2 GetPosition() const { return glm::ivec2(m_posX, m_posZ); }
 };

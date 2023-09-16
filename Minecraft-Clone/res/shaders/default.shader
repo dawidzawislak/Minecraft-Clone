@@ -1,10 +1,8 @@
 #shader vertex
 #version 330 core
 
-layout(location = 0) in vec3 aPosition;
-layout(location = 1) in vec2 aTexCoord;
-layout(location = 2) in uint aFace;
-
+layout(location = 0) in uint aData1;
+layout(location = 1) in uint aData2;
 
 out vec2 fTexCoord;
 flat out uint fFace;
@@ -12,13 +10,47 @@ out vec3 fFragPosition;
 
 uniform mat4 uProjMat;
 uniform mat4 uViewMat;
+uniform ivec2 uChunkPosition;
+uniform samplerBuffer uUVsTexture;
+
+#define MASK_POSITION 0x1FFFF
+#define MASK_FACE 0xE0000
+#define MASK_TEXID 0xFFF00000
+
+// First 17 bits - position is save as 17 base 4 digit number (x[0-16],2y[0-288], z[0-16])
+// Bits 18-20 - block face [0-5]
+void unpackData(in uint data1, in uint data2, out uvec3 position, out uint face, out uint textureID, out uint vertexPos)
+{
+	uint dataPos = data1 & uint(MASK_POSITION);
+	position.x = dataPos % 17u;
+	position.y = (dataPos / 17u) % (289u);
+	position.z = (dataPos / (4913u)) % 17u;
+
+	uint dataFace = data1 & uint(MASK_FACE);
+	face = (dataFace >> 17) % 6u;
+
+	uint dataTexID = data1 & uint(MASK_TEXID);
+	textureID = (dataTexID >> 20);
+
+	vertexPos = data2 % 4u;
+}
 
 void main()
 {
-	fTexCoord = aTexCoord;
-	fFace = aFace;
-	fFragPosition = aPosition;
-	gl_Position = uProjMat * uViewMat * vec4(aPosition.xyz, 1.0);
+	uvec3 localPosition;
+	uint vertexPos;
+	uint textureID;
+	unpackData(aData1, aData2, localPosition, fFace, textureID, vertexPos);
+
+	vec3 globalPosition = localPosition + vec3(uChunkPosition.x * 16, 0.0, uChunkPosition.y * 16);
+
+	// Get UV from UVTextureBuffer
+	uint index = (8u * textureID) + (2u * vertexPos);
+	fTexCoord.x = texelFetch(uUVsTexture, int(index)).r;
+	fTexCoord.y = texelFetch(uUVsTexture, int(index + 1u)).r;
+
+	fFragPosition = globalPosition;
+	gl_Position = uProjMat * uViewMat * vec4(globalPosition, 1.0);
 }
 
 #shader fragment
@@ -45,7 +77,7 @@ void getNormal(in uint face, out vec3 normal)
 		case 1u:
 			normal = vec3(0.0, 0.0, 1.0);
 			break;
-		case 22u:
+		case 2u:
 			normal = vec3(0.0, 0.0, -1.0);
 			break;
 		case 3u:

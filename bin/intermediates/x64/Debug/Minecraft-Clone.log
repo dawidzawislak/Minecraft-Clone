@@ -1,5 +1,5 @@
-﻿  Game.cpp
-C:\dev\Minecraft-Clone\Minecraft-Clone\src\Game.cpp(50,141): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\dev\Minecraft-Clone\Minecraft-Clone\src\Game.cpp(52,120): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\dev\Minecraft-Clone\Minecraft-Clone\src\Game.cpp(96,4): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+﻿  BlockTextureManager.cpp
+C:\dev\Minecraft-Clone\Minecraft-Clone\src\BlockTextureManager.cpp(45,16): warning C4018: '>': signed/unsigned mismatch
+C:\dev\Minecraft-Clone\Minecraft-Clone\src\BlockTextureManager.cpp(51,18): warning C4018: '<': signed/unsigned mismatch
+C:\dev\Minecraft-Clone\Minecraft-Clone\src\BlockTextureManager.cpp(82,20): warning C4018: '<': signed/unsigned mismatch
   Minecraft-Clone.vcxproj -> C:\dev\Minecraft-Clone\bin\x64\Debug\Minecraft-Clone.exe

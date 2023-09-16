@@ -5,10 +5,62 @@
 
 constexpr int CHUNK_WIDTH = 16;
 constexpr int CHUNK_HEIGHT = 256;
-constexpr int CHUNK_DPETH = 16;
-constexpr int CHUNK_VOLUME = CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DPETH;
+constexpr int CHUNK_DEPTH = 16;
+constexpr int CHUNK_VOLUME = CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH;
 
 FastNoiseLite Chunk::gen;
+
+constexpr uint32_t MASK_POS = 0x1FFFF;
+constexpr uint32_t MASK_FACE = 0xE0000;
+
+enum class BlockFace
+{
+	TOP = 0,
+	FRONT = 1,
+	BACK = 2,
+	LEFT = 3,
+	RIGHT = 4,
+	BOTTOM = 5
+};
+
+enum class VertexPos
+{
+	LU = 0,
+	LD = 1,
+	RD = 2,
+	RU = 3
+};
+
+void SetVertexData(UVVertex& vertex, glm::uvec3 pos, BlockFace face, BlockType blockID, VertexPos vertexPos)
+{
+	vertex.data1 = 0u;
+	vertex.data1 += pos.x;
+	vertex.data1 += pos.y * 17;
+	vertex.data1 += pos.z * 17 * 17 * 17;
+
+	vertex.data1 |= ((uint32_t)face % 6) << 17;
+
+	TextureNames texNames = BlocksDB::GetTextures(blockID);
+	uint16_t textureID = BlockTextureManager::GetTextureID(texNames.side);
+
+	switch (face)
+	{
+	case BlockFace::TOP:
+		textureID = BlockTextureManager::GetTextureID(texNames.top);
+		break;
+	case BlockFace::BOTTOM:
+		textureID = BlockTextureManager::GetTextureID(texNames.bottom);
+		break;
+	}
+
+	vertex.data1 |= ((uint32_t)textureID) << 20;
+
+	vertex.data2 = (uint32_t)vertexPos;
+
+	uint32_t dataTexID = vertex.data1 & 0xFFF00000;
+	dataTexID = (dataTexID >> 20);
+	int x;
+}
 
 int GetXYZIndex(int x, int y, int z)
 {
@@ -26,7 +78,7 @@ Chunk::~Chunk()
 	delete[] blocks;
 }
 
-void PushIndices(int vertOffset, std::vector<uint32_t>& indices)
+void PushIndices(std::vector<uint32_t>& indices, int vertOffset)
 {
 	indices.push_back(vertOffset + 0);
 	indices.push_back(vertOffset + 1);
@@ -34,52 +86,6 @@ void PushIndices(int vertOffset, std::vector<uint32_t>& indices)
 	indices.push_back(vertOffset + 1);
 	indices.push_back(vertOffset + 2);
 	indices.push_back(vertOffset + 3);
-}
-
-enum Side
-{
-	TOP = 0,
-	FRONT = 1,
-	BACK = 2,
-	LEFT = 3,
-	RIGHT = 4,
-	BOTTOM = 5
-};
-
-void SetUVsAndFace(UVVertex* verts, BlockType blockID, Side side)
-{
-	std::string texName = BlocksDB::GetTextures(blockID).side;
-	glm::vec3 faceNormal;
-	switch (side)
-	{
-	case TOP:
-		texName = BlocksDB::GetTextures(blockID).top;
-		faceNormal = glm::vec3(0.0, 1.0, 0.0);
-		break;
-	case FRONT:
-		faceNormal = glm::vec3(0.0, 0.0, 1.0);
-		break;
-	case BACK:
-		faceNormal = glm::vec3(0.0, 0.0, -1.0);
-		break;
-	case LEFT:
-		faceNormal = glm::vec3(-1.0, 0.0, 0.0);
-		break;
-	case RIGHT:
-		faceNormal = glm::vec3(1.0, 0.0, 0.0);
-		break;
-	case BOTTOM:
-		texName = BlocksDB::GetTextures(blockID).bottom;
-		faceNormal = glm::vec3(0.0, -1.0, 0.0);
-		break;
-	}
-
-	verts[0].uvs = BlockTextureManager::GetUVLU(texName);
-	verts[1].uvs = BlockTextureManager::GetUVLD(texName);
-	verts[2].uvs = BlockTextureManager::GetUVRD(texName);
-	verts[3].uvs = BlockTextureManager::GetUVRU(texName);
-
-	verts[0].face = verts[1].face = verts[2].face = verts[3].face = (uint32_t)side;
 }
 
 double noise(double nx, double ny) 
@@ -95,19 +101,19 @@ void Chunk::Generate(int posX, int posZ, int seed)
 	glm::vec3 chunkOrigin(m_posX * 16, 0, m_posZ * 16);
 
 	glm::vec3 cubeVerts[8];
-	cubeVerts[0] = glm::vec3(0.0f, 1.0f, 0.0f); // ful
-	cubeVerts[1] = glm::vec3(0.0f, 0.0f, 0.0f); // fll
-	cubeVerts[2] = glm::vec3(1.0f, 0.0f, 0.0f); // flr
-	cubeVerts[3] = glm::vec3(1.0f, 1.0f, 0.0f); // ful
+	cubeVerts[0] = glm::vec3(0.0f, 1.0f, 1.0f); // ful
+	cubeVerts[1] = glm::vec3(0.0f, 0.0f, 1.0f); // fll
+	cubeVerts[2] = glm::vec3(1.0f, 0.0f, 1.0f); // flr
+	cubeVerts[3] = glm::vec3(1.0f, 1.0f, 1.0f); // ful
 
-	cubeVerts[4] = glm::vec3(0.0f, 1.0f, -1.0f); // bul
-	cubeVerts[5] = glm::vec3(0.0f, 0.0f, -1.0f); // bll
-	cubeVerts[6] = glm::vec3(1.0f, 0.0f, -1.0f); // blr
-	cubeVerts[7] = glm::vec3(1.0f, 1.0f, -1.0f); // bul
+	cubeVerts[4] = glm::vec3(0.0f, 1.0f, 0.0f); // bul
+	cubeVerts[5] = glm::vec3(0.0f, 0.0f, 0.0f); // bll
+	cubeVerts[6] = glm::vec3(1.0f, 0.0f, 0.0f); // blr
+	cubeVerts[7] = glm::vec3(1.0f, 1.0f, 0.0f); // bul
 
-	for (int x = 0; x < CHUNK_WIDTH; x++) {
-		for (int z = 0; z < CHUNK_DPETH; z++) {
-			for (int y = 0; y < CHUNK_HEIGHT; y++) {
+	for (uint32_t x = 0; x < CHUNK_WIDTH; x++) {
+		for (uint32_t z = 0; z < CHUNK_DEPTH; z++) {
+			for (uint32_t y = 0; y < CHUNK_HEIGHT; y++) {
 				int xGlobal = x + m_posX * 16 + seed;
 				int zGlobal = z + m_posZ * 16 + seed;
 				float e = 1 * noise(0.5 * xGlobal, 0.5 * zGlobal);
@@ -118,7 +124,7 @@ void Chunk::Generate(int posX, int posZ, int seed)
 				int maxHeight = (int)fMaxHeight;
 
 				if (y == maxHeight)
-					blocks[GetXYZIndex(x, y, z)] = (int16_t)BlockType::STONE;
+					blocks[GetXYZIndex(x, y, z)] = (int16_t)BlockType::GRASS;
 
 				else if (y < maxHeight && y > maxHeight - 10)
 					blocks[GetXYZIndex(x, y, z)] = (int16_t)BlockType::DIRT;
@@ -130,92 +136,94 @@ void Chunk::Generate(int posX, int posZ, int seed)
 	}
 
 	for (int x = 0; x < CHUNK_WIDTH; x++) {
-		for (int z = 0; z < CHUNK_DPETH; z++) {
+		for (int z = 0; z < CHUNK_DEPTH; z++) {
 			for (int y = 0; y < CHUNK_HEIGHT; y++) {
-				if (blocks[GetXYZIndex(x, y, z)] == 0) continue;
+				BlockType type = (BlockType)blocks[GetXYZIndex(x, y, z)];
+				if (type == BlockType::AIR) continue;
+
 				glm::vec3 offset(x, y, z);
 				UVVertex faceVerts[4];
 				int indicesOffset = renderData.vertices.size();
 
 				// Front Face
 				if (z == 15 || (z < 15 && blocks[GetXYZIndex(x, y, z + 1)] == 0)) {
-					faceVerts[0].pos = cubeVerts[0] + chunkOrigin + offset;
-					faceVerts[1].pos = cubeVerts[1] + chunkOrigin + offset;
-					faceVerts[2].pos = cubeVerts[2] + chunkOrigin + offset;
-					faceVerts[3].pos = cubeVerts[3] + chunkOrigin + offset;
-					SetUVsAndFace(faceVerts, (BlockType)blocks[GetXYZIndex(x, y, z)], FRONT);
+					SetVertexData(faceVerts[0], cubeVerts[0] + offset, BlockFace::FRONT, type, VertexPos::LU);
+					SetVertexData(faceVerts[1], cubeVerts[1] + offset, BlockFace::FRONT, type, VertexPos::LD);
+					SetVertexData(faceVerts[2], cubeVerts[2] + offset, BlockFace::FRONT, type, VertexPos::RD);
+					SetVertexData(faceVerts[3], cubeVerts[3] + offset, BlockFace::FRONT, type, VertexPos::RU);
+
 					for (const UVVertex& v : faceVerts)
 						renderData.vertices.push_back(v);
 
-					PushIndices(indicesOffset, renderData.indices);
+					PushIndices(renderData.indices, indicesOffset);
 					indicesOffset += 4;
 				}
 				// Back Face
 				if (z == 0 || (z > 0 && blocks[GetXYZIndex(x, y, z - 1)] == 0)) {
-					faceVerts[0].pos = cubeVerts[7] + chunkOrigin + offset;
-					faceVerts[1].pos = cubeVerts[6] + chunkOrigin + offset;
-					faceVerts[2].pos = cubeVerts[5] + chunkOrigin + offset;
-					faceVerts[3].pos = cubeVerts[4] + chunkOrigin + offset;
-					SetUVsAndFace(faceVerts, (BlockType)blocks[GetXYZIndex(x, y, z)], BACK);
+					SetVertexData(faceVerts[0], cubeVerts[7] + offset, BlockFace::BACK, type, VertexPos::LU);
+					SetVertexData(faceVerts[1], cubeVerts[6] + offset, BlockFace::BACK, type, VertexPos::LD);
+					SetVertexData(faceVerts[2], cubeVerts[5] + offset, BlockFace::BACK, type, VertexPos::RD);
+					SetVertexData(faceVerts[3], cubeVerts[4] + offset, BlockFace::BACK, type, VertexPos::RU);
+
 					for (const UVVertex& v : faceVerts)
 						renderData.vertices.push_back(v);
 
-					PushIndices(indicesOffset, renderData.indices);
+					PushIndices(renderData.indices, indicesOffset);
 					indicesOffset += 4;
 				}
 
 				// Left Face
 				if (x == 0 || (x > 0 && blocks[GetXYZIndex(x - 1, y, z)] == 0)) {
-					faceVerts[0].pos = cubeVerts[4] + chunkOrigin + offset;
-					faceVerts[1].pos = cubeVerts[5] + chunkOrigin + offset;
-					faceVerts[2].pos = cubeVerts[1] + chunkOrigin + offset;
-					faceVerts[3].pos = cubeVerts[0] + chunkOrigin + offset;
-					SetUVsAndFace(faceVerts, (BlockType)blocks[GetXYZIndex(x, y, z)], LEFT);
+					SetVertexData(faceVerts[0], cubeVerts[4] + offset, BlockFace::LEFT, type, VertexPos::LU);
+					SetVertexData(faceVerts[1], cubeVerts[5] + offset, BlockFace::LEFT, type, VertexPos::LD);
+					SetVertexData(faceVerts[2], cubeVerts[1] + offset, BlockFace::LEFT, type, VertexPos::RD);
+					SetVertexData(faceVerts[3], cubeVerts[0] + offset, BlockFace::LEFT, type, VertexPos::RU);
+
 					for (const UVVertex& v : faceVerts)
 						renderData.vertices.push_back(v);
 
-					PushIndices(indicesOffset, renderData.indices);
+					PushIndices(renderData.indices, indicesOffset);
 					indicesOffset += 4;
 				}
 				// Right Face
 				if (x == 15 || (x < 15 && blocks[GetXYZIndex(x + 1, y, z)] == 0)) {
-					faceVerts[0].pos = cubeVerts[3] + chunkOrigin + offset;
-					faceVerts[1].pos = cubeVerts[2] + chunkOrigin + offset;
-					faceVerts[2].pos = cubeVerts[6] + chunkOrigin + offset;
-					faceVerts[3].pos = cubeVerts[7] + chunkOrigin + offset;
-					SetUVsAndFace(faceVerts, (BlockType)blocks[GetXYZIndex(x, y, z)], RIGHT);
+					SetVertexData(faceVerts[0], cubeVerts[3] + offset, BlockFace::RIGHT, type, VertexPos::LU);
+					SetVertexData(faceVerts[1], cubeVerts[2] + offset, BlockFace::RIGHT, type, VertexPos::LD);
+					SetVertexData(faceVerts[2], cubeVerts[6] + offset, BlockFace::RIGHT, type, VertexPos::RD);
+					SetVertexData(faceVerts[3], cubeVerts[7] + offset, BlockFace::RIGHT, type, VertexPos::RU);
+
 					for (const UVVertex& v : faceVerts)
 						renderData.vertices.push_back(v);
 
-					PushIndices(indicesOffset, renderData.indices);
+					PushIndices(renderData.indices, indicesOffset);
 					indicesOffset += 4;
 				}
 
 				// Up Face
 				if (y == 255 || (x < 255 && blocks[GetXYZIndex(x, y + 1, z)] == 0)) {
-					faceVerts[0].pos = cubeVerts[4] + chunkOrigin + offset;
-					faceVerts[1].pos = cubeVerts[0] + chunkOrigin + offset;
-					faceVerts[2].pos = cubeVerts[3] + chunkOrigin + offset;
-					faceVerts[3].pos = cubeVerts[7] + chunkOrigin + offset;
-					SetUVsAndFace(faceVerts, (BlockType)blocks[GetXYZIndex(x, y, z)], TOP);
+					SetVertexData(faceVerts[0], cubeVerts[4] + offset, BlockFace::TOP, type, VertexPos::LU);
+					SetVertexData(faceVerts[1], cubeVerts[0] + offset, BlockFace::TOP, type, VertexPos::LD);
+					SetVertexData(faceVerts[2], cubeVerts[3] + offset, BlockFace::TOP, type, VertexPos::RD);
+					SetVertexData(faceVerts[3], cubeVerts[7] + offset, BlockFace::TOP, type, VertexPos::RU);
+
 					for (const UVVertex& v : faceVerts)
 						renderData.vertices.push_back(v);
 
-					PushIndices(indicesOffset, renderData.indices);
+					PushIndices(renderData.indices, indicesOffset);
 					indicesOffset += 4;
 				}
 
 				// Bottom Face
 				if (y == 0 || (x > 0 && blocks[GetXYZIndex(x, y - 1, z)] == 0)) {
-					faceVerts[0].pos = cubeVerts[1] + chunkOrigin + offset;
-					faceVerts[1].pos = cubeVerts[5] + chunkOrigin + offset;
-					faceVerts[2].pos = cubeVerts[6] + chunkOrigin + offset;
-					faceVerts[3].pos = cubeVerts[2] + chunkOrigin + offset;
-					SetUVsAndFace(faceVerts, (BlockType)blocks[GetXYZIndex(x, y, z)], BOTTOM);
+					SetVertexData(faceVerts[0], cubeVerts[1] + offset, BlockFace::BOTTOM, type, VertexPos::LU);
+					SetVertexData(faceVerts[1], cubeVerts[5] + offset, BlockFace::BOTTOM, type, VertexPos::LD);
+					SetVertexData(faceVerts[2], cubeVerts[6] + offset, BlockFace::BOTTOM, type, VertexPos::RD);
+					SetVertexData(faceVerts[3], cubeVerts[2] + offset, BlockFace::BOTTOM, type, VertexPos::RU);
+
 					for (const UVVertex& v : faceVerts)
 						renderData.vertices.push_back(v);
 
-					PushIndices(indicesOffset, renderData.indices);
+					PushIndices(renderData.indices, indicesOffset);
 				}
 			}
 		}

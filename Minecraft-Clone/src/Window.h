@@ -25,6 +25,9 @@ public:
 	void SetFullScreen(bool flag);
 	void ToggleFullScreen();
 
+	const std::string& GetWindowTitle() const { return m_wndTitle; }
+	void SetWindowTitle(const std::string& title);
+
 private:
 	static void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 };
