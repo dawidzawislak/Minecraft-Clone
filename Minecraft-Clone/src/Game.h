@@ -4,6 +4,10 @@
 #include "Window.h"
 #include "Camera.h"
 #include "FastNoiseLite/FastNoiseLite.h"
+#include <unordered_set>
+#include <queue>
+
+constexpr int CHUNKS_RADIUS = 8;
 
 class Game
 {
@@ -19,15 +23,15 @@ private:
 
 	FastNoiseLite m_NoiseGen;
 
-	Chunk m_chunks[64];
-	int noIndices;
+	Chunk m_chunks[CHUNKS_RADIUS * CHUNKS_RADIUS * 4];
 
-	VertexBuffer m_vb[64];
-	VertexArray m_va[64];
-	IndexBuffer m_ib[64];
 	Shader m_shader;
 
 	glm::mat4 m_projMatrix;
+
+	std::unordered_set<std::string> m_loadedChunks;
+	std::queue<uint32_t> m_freePlaces;
+
 
 public:
 	Game(std::string title, unsigned int width, unsigned int height, bool fullScreen = false);

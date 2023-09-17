@@ -14,6 +14,11 @@ IndexBuffer::~IndexBuffer()
     GLCall(glDeleteBuffers(1, &m_id));
 }
 
+void IndexBuffer::Release()
+{
+    GLCall(glDeleteBuffers(1, &m_id));
+}
+
 void IndexBuffer::SetData(const unsigned int* data, unsigned int count)
 {
     m_count = count;

@@ -98,92 +98,12 @@ Renderer::~Renderer()
     //m_blockTextureManager.Release();
 }
 
-void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
+void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib) const
 {
     va.Bind();
     ib.Bind();
-    shader.Bind();
 
     GLCall(glDrawElements(GL_TRIANGLES, ib.GetCount(), GL_UNSIGNED_INT, nullptr));
-}
-
-const std::vector<std::string> explode(const std::string& s, const char& c)
-{
-    std::string buff{ "" };
-    std::vector<std::string> v;
-
-    for (auto n : s)
-    {
-        if (n != c) buff += n; else
-            if (n == c && buff != "") { v.push_back(buff); buff = ""; }
-    }
-    if (buff != "") v.push_back(buff);
-
-    return v;
-}
-
-void Renderer::DrawChunks(Chunk* chunks, int cntX, int cntY, const glm::mat4& vp)
-{
-    /*
-    m_blockShader.Bind();
-    m_cubeVA.Bind();
-    m_blockShader.SetUniform1i("u_Texture", 0);
-    
-    for (int i = 0; i < cntX; i++)
-        for (int j = 0; j < cntY; j++) {
-        glm::vec3 chunkOrigin = chunks[i*cntX + j].GetPosVec3() * 0.4f;
-
-        for (auto block = chunks[i * cntX + j].BlocksToRender().begin(); block != chunks[i * cntX + j].BlocksToRender().end(); block++) {
-            int x, y, z;
-            auto values = explode(block->first, ';');
-            x = atoi(values[0].c_str());
-            y = atoi(values[1].c_str());
-            z = atoi(values[2].c_str());
-            BlockType blockType = chunks[i * cntX + j].GetBlockType(x, y, z);
-            
-            glm::vec3 blockLocalPos = glm::vec3(x, y, z) * 0.4f;
-
-            glm::mat4 model(1.0f);
-            model = glm::translate(model, chunkOrigin + blockLocalPos);
-            model = glm::scale(model, glm::vec3(0.2, 0.2, 0.2));
-
-
-            glm::mat4 mvp = vp * model;
-            m_blockShader.SetUniformMat4f("u_MVP", mvp);
-
-            int facesFlags = block->second;
-
-            if (facesFlags & 0x100000) {
-                m_blockTextureManager.BindTopTexture(blockType);
-                m_cubeUpIB.Bind();
-                GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
-            }
-            m_blockTextureManager.BindSideTexture(blockType);
-            if (facesFlags & 0x10) {
-                m_cubeFrontIB.Bind();
-                GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
-            }
-            if (facesFlags & 0x100) {
-                m_cubeRightIB.Bind();
-                GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
-            }
-            if (facesFlags & 0x1000) {
-                m_cubeBackIB.Bind();
-                GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
-            }
-            if ((facesFlags & 0x1)) {
-                m_cubeLeftIB.Bind();
-                GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
-            }
-
-            if (facesFlags & 0x10000) {
-                m_blockTextureManager.BindBottomTexture(blockType);
-                m_cubeBottomIB.Bind();
-                GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
-            }
-        }
-    }
-    */
 }
 
 void Renderer::Clear() const

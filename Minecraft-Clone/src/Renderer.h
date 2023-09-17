@@ -36,9 +36,7 @@ public:
 	Renderer();
 	~Renderer();
 
-	void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
-
-	void DrawChunks(Chunk* chunks, int cntX, int cntY, const glm::mat4& vp);
+	void Draw(const VertexArray& va, const IndexBuffer& ib) const;
 
 	void Clear() const;
 };

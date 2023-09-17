@@ -33,6 +33,7 @@ public:
 	void SetCameraPosition(glm::vec3 position);
 
 	glm::mat4 GetViewMatrix();
+	glm::vec3 GetCameraPosition() const { return m_cameraPos; }
 
 	void ProcessKeyboard(Direction direction, float deltaTime);
 	void ProcessMouseMovement(float xOffset, float yOffset, bool constrainPitch = true);

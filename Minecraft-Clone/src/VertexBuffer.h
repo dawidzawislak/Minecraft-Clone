@@ -11,6 +11,7 @@ public:
 	~VertexBuffer();
 
 	void SetData(const void* data, unsigned int size);
+	void Release();
 
 	void Bind() const;
 	void Unbind() const;

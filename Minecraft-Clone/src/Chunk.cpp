@@ -2,6 +2,9 @@
 #include "BlocksDB.h"
 #include "BlockTextureManager.h"
 #include <iostream>
+#include <fstream>
+#include <filesystem>
+#include <string>
 
 constexpr int CHUNK_WIDTH = 16;
 constexpr int CHUNK_HEIGHT = 256;
@@ -56,10 +59,6 @@ void SetVertexData(UVVertex& vertex, glm::uvec3 pos, BlockFace face, BlockType b
 	vertex.data1 |= ((uint32_t)textureID) << 20;
 
 	vertex.data2 = (uint32_t)vertexPos;
-
-	uint32_t dataTexID = vertex.data1 & 0xFFF00000;
-	dataTexID = (dataTexID >> 20);
-	int x;
 }
 
 int GetXYZIndex(int x, int y, int z)
@@ -71,6 +70,8 @@ Chunk::Chunk()
 {
 	blocks = new int16_t[CHUNK_VOLUME];
 	memset(blocks, 0, sizeof(int16_t) * CHUNK_VOLUME);
+
+	loaded = false;
 }
 
 Chunk::~Chunk()
@@ -93,23 +94,22 @@ double noise(double nx, double ny)
 	return Chunk::gen.GetNoise(nx, ny) / 2.0 + 0.5;
 }
 
-void Chunk::Generate(int posX, int posZ, int seed)
+//static std::mutex m_ChunkManagementMutex;
+
+void Chunk::SetChunkData(int posX, int posZ, int seed)
 {
 	m_posX = posX;
 	m_posZ = posZ;
 
-	glm::vec3 chunkOrigin(m_posX * 16, 0, m_posZ * 16);
+	std::string fileName = "world/s" + std::to_string(seed) + "_" + std::to_string(posX) + "_" + std::to_string(posZ) + ".chunk";
+	std::ifstream fileIn(fileName, std::ios::binary);
 
-	glm::vec3 cubeVerts[8];
-	cubeVerts[0] = glm::vec3(0.0f, 1.0f, 1.0f); // ful
-	cubeVerts[1] = glm::vec3(0.0f, 0.0f, 1.0f); // fll
-	cubeVerts[2] = glm::vec3(1.0f, 0.0f, 1.0f); // flr
-	cubeVerts[3] = glm::vec3(1.0f, 1.0f, 1.0f); // ful
-
-	cubeVerts[4] = glm::vec3(0.0f, 1.0f, 0.0f); // bul
-	cubeVerts[5] = glm::vec3(0.0f, 0.0f, 0.0f); // bll
-	cubeVerts[6] = glm::vec3(1.0f, 0.0f, 0.0f); // blr
-	cubeVerts[7] = glm::vec3(1.0f, 1.0f, 0.0f); // bul
+	if (fileIn.is_open()) {
+		fileIn.read((char*)blocks, sizeof(int16_t) * CHUNK_VOLUME);
+		fileIn.close();
+		std::cout << "Read chunk from file <" << m_posX << ", " << m_posZ << ">\n";
+		return;
+	}
 
 	for (uint32_t x = 0; x < CHUNK_WIDTH; x++) {
 		for (uint32_t z = 0; z < CHUNK_DEPTH; z++) {
@@ -129,11 +129,38 @@ void Chunk::Generate(int posX, int posZ, int seed)
 				else if (y < maxHeight && y > maxHeight - 10)
 					blocks[GetXYZIndex(x, y, z)] = (int16_t)BlockType::DIRT;
 				
-				else if (y <= maxHeight - 10)
+				else if (maxHeight  > 10 && y <= maxHeight - 10)
 					blocks[GetXYZIndex(x, y, z)] = (int16_t)BlockType::STONE;
 			}
 		}
 	}
+
+	std::ofstream fileOut(fileName, std::ios::binary | std::ios::trunc);
+	if (!fileOut) {
+		std::cout << "Cannot open file to write!" << std::endl;
+		__debugbreak();
+	}
+
+	fileOut.write((char*)blocks, sizeof(int16_t) * CHUNK_VOLUME);
+
+	fileOut.close();
+
+	std::cout << "Generated chunk <" << m_posX << ", " << m_posZ << ">\n";
+}
+
+
+void Chunk::CreateRenderData()
+{
+	glm::vec3 cubeVerts[8];
+	cubeVerts[0] = glm::vec3(0.0f, 1.0f, 1.0f); // ful
+	cubeVerts[1] = glm::vec3(0.0f, 0.0f, 1.0f); // fll
+	cubeVerts[2] = glm::vec3(1.0f, 0.0f, 1.0f); // flr
+	cubeVerts[3] = glm::vec3(1.0f, 1.0f, 1.0f); // ful
+
+	cubeVerts[4] = glm::vec3(0.0f, 1.0f, 0.0f); // bul
+	cubeVerts[5] = glm::vec3(0.0f, 0.0f, 0.0f); // bll
+	cubeVerts[6] = glm::vec3(1.0f, 0.0f, 0.0f); // blr
+	cubeVerts[7] = glm::vec3(1.0f, 1.0f, 0.0f); // bul
 
 	for (int x = 0; x < CHUNK_WIDTH; x++) {
 		for (int z = 0; z < CHUNK_DEPTH; z++) {
@@ -228,4 +255,30 @@ void Chunk::Generate(int posX, int posZ, int seed)
 			}
 		}
 	}
+
+	VertexBufferLayout layout;
+	layout.Push<uint32_t>(1);
+	layout.Push<uint32_t>(1);
+
+	renderData.vb.SetData(renderData.vertices.data(), renderData.vertices.size() * sizeof(UVVertex));
+	renderData.va.AddBuffer(renderData.vb, layout);
+	renderData.ib.SetData(renderData.indices.data(), renderData.indices.size());
+
+	std::cout << "Created render data for chunk <" << m_posX << ", " << m_posZ << ">\n";
+}
+
+void Chunk::Release()
+{
+	renderData.vb.Release();
+	renderData.ib.Release();
+
+	renderData.vertices.clear();
+	renderData.vertices.shrink_to_fit();
+	renderData.indices.clear();
+	renderData.indices.shrink_to_fit();
+	memset(blocks, 0, sizeof(int16_t) * CHUNK_VOLUME);
+
+	loaded = false;
+
+	std::cout << "Released chunk <" << m_posX << ", " << m_posZ << ">\n";
 }

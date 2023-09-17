@@ -13,6 +13,11 @@ VertexBuffer::~VertexBuffer()
     GLCall(glDeleteBuffers(1, &m_id));
 }
 
+void VertexBuffer::Release()
+{
+    GLCall(glDeleteBuffers(1, &m_id));
+}
+
 void VertexBuffer::SetData(const void* data, unsigned int size)
 {
     GLCall(glGenBuffers(1, &m_id));
