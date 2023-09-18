@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <vector>
 #include "glm/glm.hpp"
 #include "FastNoiseLite/FastNoiseLite.h"
@@ -34,6 +35,7 @@ public:
 private:
 	int m_posX;
 	int m_posZ;
+	int m_seed;
 
 public:
 	Chunk();
@@ -45,8 +47,10 @@ public:
 	void LoadCPU(int posX, int posZ, int seed);
 	void LoadGPU();
 
-	void ReleaseCPU();
 	void ReleaseGPU();
+
+	bool SaveChunkDataToFile(const std::string& folderDirectory);
+	bool LoadChunkDataFromFile(const std::string& folderDirectory);
 
 	glm::ivec2 GetPosition() const { return glm::ivec2(m_posX, m_posZ); }
 };

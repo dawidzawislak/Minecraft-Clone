@@ -81,10 +81,6 @@ void Game::Draw()
 	m_shader.SetUniformMat4f("uProjMat", m_projMatrix);
 	m_shader.SetUniformMat4f("uViewMat", viewMat);
 
-	glm::vec3 playerPos = m_Camera.GetCameraPosition();
-
-	glm::ivec2 playerPosChunkCoords = glm::ivec2(playerPos.x / 16, playerPos.z / 16);
-
 	m_Renderer.Clear();
 
 	for (Chunk* chunk : ChunkLoader::GetLoadedChunks()) {
