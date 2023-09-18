@@ -8,7 +8,8 @@ enum class BlockType
 	GRASS,
 	DIRT,
 	STONE,
-	SAND
+	SAND,
+	SIZE_OF_STRUCTURE
 };
 
 struct TextureNames
@@ -20,7 +21,7 @@ struct TextureNames
 
 class BlocksDB
 {
-	static std::unordered_map<int16_t, TextureNames> m_textureNames;
+	static std::vector<TextureNames> m_textureNames;
 
 private:
 	BlocksDB();
@@ -28,5 +29,5 @@ private:
 public:
 	static void Initialize();
 
-	static TextureNames GetTextures(BlockType blockID) { return m_textureNames[(int16_t)blockID]; }
+	static const TextureNames& GetTextures(BlockType blockID) { return m_textureNames[(int16_t)blockID]; }
 };

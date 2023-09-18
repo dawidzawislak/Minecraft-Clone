@@ -7,7 +7,9 @@
 #include <unordered_set>
 #include <queue>
 
-constexpr int CHUNKS_RADIUS = 8;
+constexpr int CHUNKS_RADIUS = 16;
+constexpr int CHUNKS_RADIUS_SQUARED = CHUNKS_RADIUS * CHUNKS_RADIUS;
+static constexpr int SEED = 123;
 
 class Game
 {
@@ -32,6 +34,8 @@ private:
 	std::unordered_set<std::string> m_loadedChunks;
 	std::queue<uint32_t> m_freePlaces;
 
+	std::queue<std::future<Chunk>> m_chunksToCreateQueue;
+	std::queue<std::future<int>> m_chunksToDeleteQueue;
 
 public:
 	Game(std::string title, unsigned int width, unsigned int height, bool fullScreen = false);
@@ -44,5 +48,7 @@ private:
 
 	void Update();
 	void Draw();
+
+	void SynchronizeThreads();
 };
 

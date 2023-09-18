@@ -19,6 +19,7 @@ uniform samplerBuffer uUVsTexture;
 
 // First 17 bits - position is save as 17 base 4 digit number (x[0-16],2y[0-288], z[0-16])
 // Bits 18-20 - block face [0-5]
+// Bits 21-32 - textureID
 void unpackData(in uint data1, in uint data2, out uvec3 position, out uint face, out uint textureID, out uint vertexPos)
 {
 	uint dataPos = data1 & uint(MASK_POSITION);

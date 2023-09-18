@@ -1,9 +1,10 @@
 #include "BlocksDB.h"
 
-std::unordered_map<int16_t, TextureNames> BlocksDB::m_textureNames;
+std::vector<TextureNames> BlocksDB::m_textureNames;
 
 void BlocksDB::Initialize()
 {
+	m_textureNames.resize((int16_t)BlockType::SIZE_OF_STRUCTURE);
 	// { Top, Side, Bottom }
 	m_textureNames[(int16_t)BlockType::GRASS] = { "grass_block_top", "grass_block_side", "dirt" };
 	m_textureNames[(int16_t)BlockType::DIRT] = { "dirt", "dirt", "dirt" };

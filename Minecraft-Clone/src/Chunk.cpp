@@ -43,7 +43,7 @@ void SetVertexData(UVVertex& vertex, glm::uvec3 pos, BlockFace face, BlockType b
 
 	vertex.data1 |= ((uint32_t)face % 6) << 17;
 
-	TextureNames texNames = BlocksDB::GetTextures(blockID);
+	const TextureNames& texNames = BlocksDB::GetTextures(blockID);
 	uint16_t textureID = BlockTextureManager::GetTextureID(texNames.side);
 
 	switch (face)
@@ -76,7 +76,7 @@ Chunk::Chunk()
 
 Chunk::~Chunk()
 {
-	delete[] blocks;
+	//delete[] blocks;
 }
 
 void PushIndices(std::vector<uint32_t>& indices, int vertOffset)
@@ -94,37 +94,35 @@ double noise(double nx, double ny)
 	return Chunk::gen.GetNoise(nx, ny) / 2.0 + 0.5;
 }
 
-//static std::mutex m_ChunkManagementMutex;
-
 void Chunk::SetChunkData(int posX, int posZ, int seed)
 {
 	m_posX = posX;
 	m_posZ = posZ;
-
+	/*
 	std::string fileName = "world/s" + std::to_string(seed) + "_" + std::to_string(posX) + "_" + std::to_string(posZ) + ".chunk";
 	std::ifstream fileIn(fileName, std::ios::binary);
 
 	if (fileIn.is_open()) {
 		fileIn.read((char*)blocks, sizeof(int16_t) * CHUNK_VOLUME);
 		fileIn.close();
-		std::cout << "Read chunk from file <" << m_posX << ", " << m_posZ << ">\n";
+		//std::cout << "Read chunk from file <" << m_posX << ", " << m_posZ << ">\n";
 		return;
 	}
-
+	*/
 	for (uint32_t x = 0; x < CHUNK_WIDTH; x++) {
 		for (uint32_t z = 0; z < CHUNK_DEPTH; z++) {
 			for (uint32_t y = 0; y < CHUNK_HEIGHT; y++) {
 				int xGlobal = x + m_posX * 16 + seed;
 				int zGlobal = z + m_posZ * 16 + seed;
-				float e = 1 * noise(0.5 * xGlobal, 0.5 * zGlobal);
-				+0.5 * noise(1 * xGlobal, 1 * zGlobal);
+				float e = 1 * noise(0.5 * xGlobal, 0.5 * zGlobal)
+				+0.5 * noise(1 * xGlobal, 1 * zGlobal)
 				+0.5 * noise(2 * xGlobal, 2 * zGlobal);
 				float fMaxHeight = e / (2.0) * 255;
 
 				int maxHeight = (int)fMaxHeight;
 
 				if (y == maxHeight)
-					blocks[GetXYZIndex(x, y, z)] = (int16_t)BlockType::GRASS;
+					blocks[GetXYZIndex(x, y, z)] = (int16_t)BlockType::STONE;
 
 				else if (y < maxHeight && y > maxHeight - 10)
 					blocks[GetXYZIndex(x, y, z)] = (int16_t)BlockType::DIRT;
@@ -134,18 +132,17 @@ void Chunk::SetChunkData(int posX, int posZ, int seed)
 			}
 		}
 	}
-
+	/*
 	std::ofstream fileOut(fileName, std::ios::binary | std::ios::trunc);
 	if (!fileOut) {
-		std::cout << "Cannot open file to write!" << std::endl;
+		//std::cout << "Cannot open file to write!" << std::endl;
 		__debugbreak();
 	}
 
 	fileOut.write((char*)blocks, sizeof(int16_t) * CHUNK_VOLUME);
 
 	fileOut.close();
-
-	std::cout << "Generated chunk <" << m_posX << ", " << m_posZ << ">\n";
+	*/
 }
 
 
@@ -255,7 +252,33 @@ void Chunk::CreateRenderData()
 			}
 		}
 	}
+}
 
+void Chunk::ReleaseCPU()
+{
+	renderData.vertices.clear();
+	renderData.indices.clear();
+	delete[] blocks;
+}
+
+void Chunk::ReleaseGPU()
+{
+	renderData.vb.Release();
+	renderData.va.Release();
+	renderData.ib.Release();
+
+	loaded = false;
+}
+
+void Chunk::LoadCPU(int posX, int posZ, int seed)
+{
+	SetChunkData(posX, posZ, seed);
+
+	CreateRenderData();
+}
+
+void Chunk::LoadGPU()
+{
 	VertexBufferLayout layout;
 	layout.Push<uint32_t>(1);
 	layout.Push<uint32_t>(1);
@@ -264,21 +287,5 @@ void Chunk::CreateRenderData()
 	renderData.va.AddBuffer(renderData.vb, layout);
 	renderData.ib.SetData(renderData.indices.data(), renderData.indices.size());
 
-	std::cout << "Created render data for chunk <" << m_posX << ", " << m_posZ << ">\n";
-}
-
-void Chunk::Release()
-{
-	renderData.vb.Release();
-	renderData.ib.Release();
-
-	renderData.vertices.clear();
-	renderData.vertices.shrink_to_fit();
-	renderData.indices.clear();
-	renderData.indices.shrink_to_fit();
-	memset(blocks, 0, sizeof(int16_t) * CHUNK_VOLUME);
-
-	loaded = false;
-
-	std::cout << "Released chunk <" << m_posX << ", " << m_posZ << ">\n";
+	loaded = true;
 }

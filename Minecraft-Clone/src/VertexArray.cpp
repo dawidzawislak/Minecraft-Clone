@@ -4,16 +4,26 @@
 
 VertexArray::VertexArray()
 {
-	GLCall(glGenVertexArrays(1, &m_id));
+	m_id = 0;
 }
 
 VertexArray::~VertexArray()
 {
-	GLCall(glDeleteVertexArrays(1, &m_id));
+	if (m_id != 0)
+		Release();
+}
+void VertexArray::Release()
+{
+	if (m_id != 0) {
+		GLCall(glDeleteVertexArrays(1, &m_id));
+		m_id = 0;
+	}
 }
 
 void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout)
 {
+	if(!m_id)
+		GLCall(glGenVertexArrays(1, &m_id));
 	Bind();
 	vb.Bind();
 	const auto& elements = layout.GetElements();
