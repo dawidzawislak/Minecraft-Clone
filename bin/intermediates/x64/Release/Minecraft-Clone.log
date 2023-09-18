@@ -1,17 +1,9 @@
-﻿  Chunk.cpp
-C:\dev\Minecraft-Clone\Minecraft-Clone\src\Chunk.cpp(117,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\dev\Minecraft-Clone\Minecraft-Clone\src\Chunk.cpp(120,22): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\dev\Minecraft-Clone\Minecraft-Clone\src\Chunk.cpp(127,16): warning C4018: '<': signed/unsigned mismatch
-C:\dev\Minecraft-Clone\Minecraft-Clone\src\Chunk.cpp(127,33): warning C4018: '>': signed/unsigned mismatch
-C:\dev\Minecraft-Clone\Minecraft-Clone\src\Chunk.cpp(130,35): warning C4018: '<=': signed/unsigned mismatch
-C:\dev\Minecraft-Clone\Minecraft-Clone\src\Chunk.cpp(170,51): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-C:\dev\Minecraft-Clone\Minecraft-Clone\src\Chunk.cpp(286,97): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\dev\Minecraft-Clone\Minecraft-Clone\src\Chunk.cpp(288,76): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+﻿  Game.cpp
 LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
   Generating code
-  0 of 2772 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+  29 of 2552 functions ( 1.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
+    90 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
 glew32s.lib(glew.obj) : warning LNK4099: PDB 'vc120.pdb' was not found with 'glew32s.lib(glew.obj)' or at 'C:\dev\Minecraft-Clone\bin\x64\Release\vc120.pdb'; linking object as if no debug info
   Minecraft-Clone.vcxproj -> C:\dev\Minecraft-Clone\bin\x64\Release\Minecraft-Clone.exe

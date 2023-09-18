@@ -5,7 +5,6 @@
 #include "FastNoiseLite/FastNoiseLite.h"
 #include "VertexArray.h"
 #include "IndexBuffer.h"
-#include <future>
 
 struct UVVertex
 {
@@ -39,7 +38,6 @@ public:
 
 	static FastNoiseLite gen;
 
-	LoadingState chunkState;
 	bool loaded;
 private:
 	int m_posX;

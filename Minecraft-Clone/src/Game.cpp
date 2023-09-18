@@ -23,6 +23,8 @@ Game::Game(std::string title, unsigned int width, unsigned int height, bool full
 
 Game::~Game()
 {
+	/// TODO: cleanup every chunk
+
 	BlockTextureManager::Release();
 }
 
@@ -38,29 +40,29 @@ void Game::Run()
 	}
 }
 
-static Chunk CreateChunk(int posX, int posZ)
-{
-	Chunk chunk;
-
-	chunk.LoadCPU(posX, posZ, SEED);
-	return chunk;
-}
+static std::queue<Chunk*> m_freedChunks;
 
 static std::mutex m;
 
-static int DeleteChunk(Chunk* chunk, int i)
+static Chunk* CreateChunk(int posX, int posZ)
 {
-	std::lock_guard<std::mutex> lock(m);
-	chunk->ReleaseCPU();
+	m.lock();
+	if (m_freedChunks.size() > 0) {
+		Chunk* chunk = m_freedChunks.front();
+		m_freedChunks.pop();
+		m.unlock();
+		chunk->LoadCPU(posX, posZ, SEED);
 
-	return i;
+		return chunk;
+	}
+	m.unlock();
+	Chunk* chunk = new Chunk();
+	chunk->LoadCPU(posX, posZ, SEED);
+	return chunk;
 }
 
 void Game::InitializeScene()
 {
-	for (int i = 0; i < CHUNKS_RADIUS_SQUARED * 4; i++)
-		m_freePlaces.push(i);
-
 	m_Camera.SetCameraPosition(glm::vec3(0.0f, 150.0f, 0.0f));
 	m_projMatrix = glm::perspective(glm::radians(45.0f), (float)m_Window.GetWidth() / (float)m_Window.GetHeight(), 0.1f, 2000.0f);
 
@@ -87,19 +89,9 @@ void Game::InitializeScene()
 void Game::SynchronizeThreads()
 {
 	while (m_chunksToCreateQueue.size() > 0 && is_ready(m_chunksToCreateQueue.front())) {
-		uint32_t index = m_freePlaces.front();
-		m_freePlaces.pop();
-
-		m_chunks[index] = m_chunksToCreateQueue.front().get();
+		m_chunks.push_back(m_chunksToCreateQueue.front().get());
 		m_chunksToCreateQueue.pop();
-		m_chunks[index].LoadGPU();
-		m_chunks[index].loaded = true;
-	}
-	while (m_chunksToDeleteQueue.size() > 0 && is_ready(m_chunksToDeleteQueue.front())) {
-		int index = m_chunksToDeleteQueue.front().get();
-		m_chunksToDeleteQueue.pop();
-		m_loadedChunks.erase(std::to_string(m_chunks[index].GetPosition().x) + ":" + std::to_string(m_chunks[index].GetPosition().y));
-		m_freePlaces.push(index);
+		m_chunks.back()->LoadGPU();
 	}
 }
 
@@ -130,14 +122,17 @@ void Game::Update()
 
 	glm::ivec2 playerPosChunkCoords = glm::ivec2(playerPos.x / 16, playerPos.z / 16);
 	// Remove chunk if needed
-	for (int i = 0; i < CHUNKS_RADIUS * CHUNKS_RADIUS * 4; i++) {
-		if (!m_chunks[i].loaded) continue;
+	for (int i = 0; i < m_chunks.size(); i++) {
 
-		glm::ivec2 chunkPos = m_chunks[i].GetPosition();
+		glm::ivec2 chunkPos = m_chunks[i]->GetPosition();
 
 		if (pow(chunkPos.x - playerPosChunkCoords.x, 2) + pow(chunkPos.y - playerPosChunkCoords.y, 2) > CHUNKS_RADIUS * CHUNKS_RADIUS) {
-			m_chunks[i].ReleaseGPU();
-			m_chunksToDeleteQueue.push(std::async(std::launch::async, DeleteChunk, &m_chunks[i], i));
+			Chunk* chunk = m_chunks[i];
+			chunk->ReleaseGPU();
+			//m_chunksToDeleteQueue.push(std::async(std::launch::async, DeleteChunk, m_chunks[i]));
+			m_loadedChunks.erase(std::to_string(chunk->GetPosition().x) + ":" + std::to_string(chunk->GetPosition().y));
+			m_chunks.erase(m_chunks.begin() + i);
+			m_freedChunks.push(chunk);
 		}
 	}
 	
@@ -165,12 +160,12 @@ void Game::Draw()
 
 	m_Renderer.Clear();
 
-	for (int i = 0; i < CHUNKS_RADIUS * CHUNKS_RADIUS * 4; i++) {
-		if (!m_chunks[i].loaded) continue;
+	for (Chunk* chunk : m_chunks) {
+		if (!chunk->loaded) continue;
 
-		glm::ivec2 chunkPos = m_chunks[i].GetPosition();
+		glm::ivec2 chunkPos = chunk->GetPosition();
 		m_shader.SetUniform2i("uChunkPosition", chunkPos.x, chunkPos.y);
 		
-		m_Renderer.Draw(m_chunks[i].renderData.va, m_chunks[i].renderData.ib);
+		m_Renderer.Draw(chunk->renderData.va, chunk->renderData.ib);
 	}
 }
