@@ -26,15 +26,9 @@ private:
 
 	FastNoiseLite m_NoiseGen;
 
-	std::vector<Chunk*> m_chunks;
-
 	Shader m_shader;
 
 	glm::mat4 m_projMatrix;
-
-	std::unordered_set<std::string> m_loadedChunks;
-
-	std::queue<std::future<Chunk*>> m_chunksToCreateQueue;
 
 public:
 	Game(std::string title, unsigned int width, unsigned int height, bool fullScreen = false);

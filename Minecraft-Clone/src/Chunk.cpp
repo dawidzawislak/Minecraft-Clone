@@ -69,9 +69,6 @@ int GetXYZIndex(int x, int y, int z)
 Chunk::Chunk()
 {
 	blocks = new int16_t[CHUNK_VOLUME];
-	//memset(blocks, 0, sizeof(int16_t) * CHUNK_VOLUME);
-
-	loaded = false;
 }
 
 Chunk::~Chunk()
@@ -276,14 +273,11 @@ void Chunk::ReleaseGPU()
 	renderData.vb.Release();
 	renderData.va.Release();
 	renderData.ib.Release();
-
-	loaded = false;
 }
 
 void Chunk::LoadCPU(int posX, int posZ, int seed)
 {
 	SetChunkData(posX, posZ, seed);
-
 	CreateRenderData();
 }
 
@@ -296,6 +290,4 @@ void Chunk::LoadGPU()
 	renderData.vb.SetData(renderData.vertices.data(), renderData.vertices.size() * sizeof(UVVertex));
 	renderData.va.AddBuffer(renderData.vb, layout);
 	renderData.ib.SetData(renderData.indices.data(), renderData.indices.size());
-
-	loaded = true;
 }

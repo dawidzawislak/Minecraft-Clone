@@ -22,13 +22,6 @@ struct ChunkRenderData
 	IndexBuffer ib;
 };
 
-enum class LoadingState
-{
-	NOT_LOADED,
-	LOADED_CPU,
-	FULLY_LOADED
-};
-
 class Chunk
 {
 public:
@@ -38,7 +31,6 @@ public:
 
 	static FastNoiseLite gen;
 
-	bool loaded;
 private:
 	int m_posX;
 	int m_posZ;

@@ -8,18 +8,26 @@
 
 class ChunkLoader
 {
+private:
+	static std::vector<Chunk*> m_chunks;
+
+	static int m_chunkRadius;
+	static int m_seed;
+
+	static std::unordered_set<std::string> m_loadedChunks;
+	static std::queue<std::future<Chunk*>> m_chunksToCreateQueue;
+
 public:
-	std::vector<Chunk> loadedChunks;
+	static void Initialize(uint32_t chunkRadius, glm::vec3 playerPos, int seed);
+
+	static void Update(glm::vec3 playerPos);
+
+	static void ReleaseChunks();
+
+	static const std::vector<Chunk*>& GetLoadedChunks();
 
 private:
-	uint32_t m_chunkRadius;
+	ChunkLoader();
 
-	std::unordered_set<std::string> m_loadedChunks;
-
-	std::queue<std::future<Chunk*>> m_chunksToCreateQueue;
-
-public:
-	void Initialize(uint32_t chunkRadius, glm::ivec2 playerPos);
-
-	void Update(glm::ivec2 playerPos);
+	static void SynchronizeThreads();
 };
