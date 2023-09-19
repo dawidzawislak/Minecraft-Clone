@@ -69,6 +69,9 @@
     <ClCompile Include="src\ChunkLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ECS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\default.shader" />
@@ -1381,6 +1384,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ChunkLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ECS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ECSComponents.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

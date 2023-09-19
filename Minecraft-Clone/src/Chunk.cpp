@@ -112,9 +112,7 @@ void Chunk::SetChunkData(int posX, int posZ, int seed)
 			for (uint32_t y = 0; y < CHUNK_HEIGHT; y++) {
 				int xGlobal = x + m_posX * 16 + seed;
 				int zGlobal = z + m_posZ * 16 + seed;
-				float e = 1 * noise(0.5 * xGlobal, 0.5 * zGlobal)
-				+0.5 * noise(1 * xGlobal, 1 * zGlobal)
-				+0.5 * noise(2 * xGlobal, 2 * zGlobal);
+				float e = 1 * noise(0.25 * xGlobal, 0.25 * zGlobal) +0.25 * noise(1 * xGlobal, 1 * zGlobal);
 				float fMaxHeight = e / (2.0) * 255;
 
 				int maxHeight = (int)fMaxHeight;

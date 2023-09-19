@@ -156,6 +156,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\BlocksDB.cpp" />
+    <ClCompile Include="src\ECS.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\Chunk.cpp" />
     <ClCompile Include="src\BlockTextureManager.cpp" />
@@ -316,6 +317,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ChunkLoader.h" />
+    <ClInclude Include="src\ECS.h" />
+    <ClInclude Include="src\ECSComponents.h" />
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\Chunk.h" />
     <ClInclude Include="src\BlocksDB.h" />
