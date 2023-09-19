@@ -18,25 +18,23 @@ bool GLLogCall(const char* function, const char* file, int line);
 
 class Renderer
 {
-	//BlockTextureManager m_blockTextureManager;
-	VertexArray m_cubeVA;
-	IndexBuffer m_cubeFrontIB;
-	IndexBuffer m_cubeBackIB;
-	IndexBuffer m_cubeLeftIB;
-	IndexBuffer m_cubeRightIB;
-	IndexBuffer m_cubeBottomIB;
-	IndexBuffer m_cubeUpIB;
+	VertexBufferLayout m_lineVBLayout;
+	VertexBuffer m_lineVB;
+	VertexArray m_lineVA;
 
-	VertexBuffer m_cubeVB;
-	VertexBufferLayout m_cubeLayout;
+	Shader m_lineShader;
 
-	Shader m_blockShader;
+	glm::mat4 m_projMatrix;
 
 public:
 	Renderer();
 	~Renderer();
 
 	void Draw(const VertexArray& va, const IndexBuffer& ib) const;
+
+	void DrawLine(const glm::vec3& start, const glm::vec3& end, float width, const glm::vec3& color, const glm::mat4& viewMatrix);
+
+	void SetProjectionMatrix(const glm::mat4& projMatrix);
 
 	void Clear() const;
 };

@@ -11,9 +11,9 @@
 
 int main()
 {
-    //Game g("test", 1280, 720);
-    //g.Run();
-
+    Game game("test", 1280, 720);
+    game.Run();
+    /*
     EntityID e1 = EntityRegisty::NewEntity();
     EntityID e2 = EntityRegisty::NewEntity();
     EntityID e3 = EntityRegisty::NewEntity();
@@ -56,6 +56,6 @@ int main()
     std::cout << "\nTransform ID: " << GetComponentID<Transform>();
 
     EntityRegisty::Release();
-
+    */
     return 0;
 }
