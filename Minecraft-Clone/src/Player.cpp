@@ -73,7 +73,7 @@ void Player::Update(float dt)
 
 
 	if (Input::IsKeyPressed(GLFW_KEY_SPACE) && transform->position.y == m_prevY)
-		rb->velocity.y = 9.0f;
+		rb->velocity.y = 8.25f;
 
 	m_prevY = transform->position.y;
 }

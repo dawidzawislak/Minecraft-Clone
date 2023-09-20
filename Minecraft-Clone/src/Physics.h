@@ -13,11 +13,24 @@ class Physics
 	static float m_gravity;
 	static bool m_playerOnGround;
 	static bool m_firtTimeOnGround;
+	static bool m_blockedX, m_blockedY;
 	static glm::ivec3 m_prevPos;
 
 public:
 	static void Update(float dt)
 	{
+
+
+		for (EntityID id : RegistryView<Transform, RigidBody>())
+		{
+			RigidBody* rb = EntityRegistry::GetComponent<RigidBody>(id);
+			if (!m_playerOnGround)
+				rb->acceleration.y = -m_gravity;
+			rb->velocity.y += rb->acceleration.y * dt;
+			Transform* t = EntityRegistry::GetComponent<Transform>(id);
+			t->position += rb->velocity * dt;
+		}
+
 		// Resolve collisions
 		for (EntityID id : RegistryView<Transform, BoxCollider, RigidBody>())
 		{
@@ -35,7 +48,7 @@ public:
 
 			Transform newTransform;
 			newTransform.position = t->position;
-			newTransform.position += rb->velocity * dt;
+			//newTransform.position += rb->velocity * dt;
 
 			std::vector<glm::ivec3> toCheckY;
 			glm::vec3 leftDownDown = newTransform.position - bc->size;
@@ -56,31 +69,40 @@ public:
 			toCheckXZ.emplace_back(floor(rightDownDown.x), floor(rightUpUp.y), floor(rightDownDown.z));
 			toCheckXZ.emplace_back(floor(rightDownDown.x), floor(rightUpUp.y), floor(rightUpUp.z));
 
+			float margin = 0.00001f;
+
 			for (const auto& blockCoords : toCheckXZ) {
 				if (ChunkLoader::GetBlock(blockCoords) != BlockType::AIR) {
 					boxTransform.position = glm::vec3(blockCoords) + boxCollider.size;
 
 					glm::vec3 intersect = GetIntersection(t, bc, &boxTransform, &boxCollider);
 
-					if (abs(intersect.x) < abs(intersect.z))
-						rb->velocity.x = 0.0f;
-					else
+					if (abs(intersect.x) < abs(intersect.z)) {
+						if (abs(intersect.x) > 0.0f) {
+							rb->velocity.x = 0.0f;
+							m_blockedX = true;
+							if (intersect.x > 0)
+								intersect.x += margin;
+							else
+								intersect.x -= margin;
+							t->position.x += intersect.x;
+						}
+					}
+					else {
 						rb->velocity.z = 0.0f;
+						m_blockedY = true;
+						if (intersect.z > 0)
+							intersect.z += margin;
+						else
+							intersect.z -= margin;
+						t->position.z += intersect.z;
+					}
 				}
 			}
 		}
 
-		for (EntityID id : RegistryView<Transform, RigidBody>())
-		{
-			RigidBody* rb = EntityRegistry::GetComponent<RigidBody>(id);
-			if (!m_playerOnGround)
-				rb->acceleration.y = -m_gravity;
-			rb->velocity.y += rb->acceleration.y * dt;
-			Transform* t = EntityRegistry::GetComponent<Transform>(id);
-			t->position += rb->velocity * dt;
-		}
 
-		// Resolve collisions
+		// Y Axis
 		for (EntityID id : RegistryView<Transform, BoxCollider, RigidBody>())
 		{
 			Transform* t = EntityRegistry::GetComponent<Transform>(id);
@@ -106,7 +128,7 @@ public:
 			//rb->velocity.y = 0;
 			//rb->acceleration.y = 0;
 			//t->position.y = 150.0f;
-			
+
 			leftDownDown = t->position - bc->size;
 			rightUpUp = t->position + bc->size;
 
@@ -121,8 +143,7 @@ public:
 				if (ChunkLoader::GetBlock(blockCoords) != BlockType::AIR) {
 					rb->velocity.y = 0;
 					rb->acceleration.y = 0;
-					if (t->position.y >= blockCoords.y + 1.1f)
-						t->position.y = blockCoords.y + 2.0f;
+					t->position.y = blockCoords.y + 2.0f;
 					m_playerOnGround = true;
 					m_firtTimeOnGround = false;
 					collided = true;
@@ -133,7 +154,6 @@ public:
 				m_playerOnGround = false;
 		}
 	}
-
 private:
 	Physics() {}
 
@@ -189,3 +209,5 @@ float Physics::m_gravity = 30.0f;
 bool Physics::m_playerOnGround = false;
 glm::ivec3 Physics::m_prevPos;
 bool Physics::m_firtTimeOnGround = true;
+bool Physics::m_blockedX = false;
+bool Physics::m_blockedY = false;
