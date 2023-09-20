@@ -52,5 +52,7 @@ public:
 	bool SaveChunkDataToFile(const std::string& folderDirectory);
 	bool LoadChunkDataFromFile(const std::string& folderDirectory);
 
+	int GetXYZIndex(int x, int y, int z);
+
 	glm::ivec2 GetPosition() const { return glm::ivec2(m_posX, m_posZ); }
 };

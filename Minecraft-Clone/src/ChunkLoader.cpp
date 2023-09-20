@@ -106,3 +106,26 @@ void ChunkLoader::SynchronizeThreads()
 		m_chunks.back()->LoadGPU();
 	}
 }
+
+BlockType ChunkLoader::GetBlock(glm::ivec3 position)
+{
+	if (position.y < 0 || position.z > 255) return BlockType::AIR;
+
+	glm::ivec2 chunkCoords(position.x / 16, position.z / 16);
+
+	if (position.x - chunkCoords.x * 16 < 0) {
+		chunkCoords.x--;
+	}
+
+	if (position.z - chunkCoords.y * 16 < 0) {
+		chunkCoords.y--;
+	}
+
+	glm::ivec3 localChunkCoords(position.x - chunkCoords.x * 16, position.y, position.z - chunkCoords.y * 16);
+
+	for (Chunk* chunk : m_chunks) {
+		if (chunk->GetPosition().x == chunkCoords.x && chunk->GetPosition().y == chunkCoords.y)
+			return (BlockType)chunk->blocks[chunk->GetXYZIndex(localChunkCoords.x, localChunkCoords.y, localChunkCoords.z)];
+	}
+	return BlockType::AIR;
+}

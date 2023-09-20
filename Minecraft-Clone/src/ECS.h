@@ -14,29 +14,29 @@ const int MAX_ENTITIES = 100;
 
 struct ComponentPool;
 
-static int s_componentCounter = 0;
-template <class T>
-static int GetComponentID()
-{
-	static int s_componentId = s_componentCounter++;
-	return s_componentId;
-}
-
 struct Entity
 {
 	EntityID id;
 	ComponentsMask componentsMask;
 };
 
-class EntityRegisty
+class EntityRegistry
 {
 private:
 	static std::vector<Entity> m_entities;
 	static std::vector<ComponentPool*> m_componentPools;
 
 	static std::vector<EntityIndex> m_freedEntities;
+	static int s_componentCounter;
 
 public:
+	template <class T>
+	static int GetComponentID()
+	{
+		static int s_componentId = s_componentCounter++;
+		return s_componentId;
+	}
+
 	static EntityID NewEntity();
 	static void DestroyEntity(EntityID entityID);
 
@@ -111,7 +111,7 @@ public:
 	}
 
 private:
-	EntityRegisty() {};
+	EntityRegistry() {};
 };
 template<typename... ComponentTypes>
 struct RegistryView
@@ -122,7 +122,7 @@ struct RegistryView
 			all = true;
 		}
 		else {
-			int componentIds[] = { 0, GetComponentID<ComponentTypes>() ... };
+			int componentIds[] = { 0, EntityRegistry::GetComponentID<ComponentTypes>() ... };
 			for (int i = 1; i < (sizeof...(ComponentTypes) + 1); i++)
 				componentsMask.set(componentIds[i]);
 		}
@@ -130,35 +130,35 @@ struct RegistryView
 
 	struct Iterator
 	{
-		Iterator(EntityIndex index, ComponentsMask mask, bool all) 
+		Iterator(EntityIndex index, ComponentsMask mask, bool all)
 			: index(index), mask(mask), all(all) {}
 
 		EntityID operator*() const
 		{
-			return EntityRegisty::GetEntityID(index);
+			return EntityRegistry::GetEntityID(index);
 		}
 
 		bool operator==(const Iterator& other) const
 		{
-			return index == other.index || index == EntityRegisty::GetNumOfEntities();
+			return index == other.index || index == EntityRegistry::GetNumOfEntities();
 		}
 
 		bool operator!=(const Iterator& other) const
 		{
-			return index != other.index && index != EntityRegisty::GetNumOfEntities();
+			return index != other.index && index != EntityRegistry::GetNumOfEntities();
 		}
 
 		bool ValidIndex()
 		{
-			return EntityRegisty::IsEntityValid(EntityRegisty::GetEntityID(index)) &&
-				(all || mask == (mask & EntityRegisty::GetEntityComponentsMask(index)));
+			return EntityRegistry::IsEntityValid(EntityRegistry::GetEntityID(index)) &&
+				(all || mask == (mask & EntityRegistry::GetEntityComponentsMask(index)));
 		}
 
 		Iterator& operator++()
 		{
 			do {
 				index++;
-			} while (index < EntityRegisty::GetNumOfEntities() && !ValidIndex());
+			} while (index < EntityRegistry::GetNumOfEntities() && !ValidIndex());
 			return *this;
 		}
 
@@ -169,18 +169,18 @@ struct RegistryView
 	const Iterator begin() const
 	{
 		int firstIndex = 0;
-		while (firstIndex < EntityRegisty::GetNumOfEntities() &&
-			(componentsMask != (componentsMask & EntityRegisty::GetEntityComponentsMask(firstIndex))
-				|| !EntityRegisty::IsEntityValid(EntityRegisty::GetEntityID(firstIndex))))
+		while (firstIndex < EntityRegistry::GetNumOfEntities() &&
+			(componentsMask != (componentsMask & EntityRegistry::GetEntityComponentsMask(firstIndex))
+				|| !EntityRegistry::IsEntityValid(EntityRegistry::GetEntityID(firstIndex))))
 		{
 			firstIndex++;
 		}
 		return Iterator(firstIndex, componentsMask, all);
 	}
-	
+
 	const Iterator end() const
 	{
-		return Iterator(EntityIndex(EntityRegisty::GetNumOfEntities()), componentsMask, all);
+		return Iterator(EntityIndex(EntityRegistry::GetNumOfEntities()), componentsMask, all);
 	}
 	ComponentsMask componentsMask;
 	bool all{ false };

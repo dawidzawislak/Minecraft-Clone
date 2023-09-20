@@ -7,12 +7,15 @@
 
 #include "ChunkLoader.h"
 
+#include "Physics.h"
+
+static const glm::vec3 PLAYER_INITIAL_POS = glm::vec3(0.0f, 200.0f, 0.0f);
+
 Game::Game(std::string title, unsigned int width, unsigned int height, bool fullScreen)
-	: m_Window(title, width, height, fullScreen), m_shader("res/shaders/default.shader")
+	: m_Window(title, width, height, fullScreen), m_shader("res/shaders/default.shader"), m_Player(PLAYER_INITIAL_POS)
 {
 	BlockTextureManager::Initialize("res/textures/block");
 	BlocksDB::Initialize();
-	Input::SetCameraBinding(&m_Camera);
 
 	InitializeScene();
 }
@@ -38,11 +41,10 @@ void Game::Run()
 
 void Game::InitializeScene()
 {
-	m_Camera.SetCameraPosition(glm::vec3(0.0f, 150.0f, 0.0f));
 	m_projMatrix = glm::perspective(glm::radians(45.0f), (float)m_Window.GetWidth() / (float)m_Window.GetHeight(), 0.1f, 2000.0f);
 	m_Renderer.SetProjectionMatrix(m_projMatrix);
 
-	ChunkLoader::Initialize(CHUNKS_RADIUS, m_Camera.GetCameraPosition(), SEED);
+	ChunkLoader::Initialize(CHUNKS_RADIUS, PLAYER_INITIAL_POS, SEED);
 
 	BlockTextureManager::BindTextureAtlasAndUVTextureBuffer();
 	m_shader.Bind();
@@ -61,21 +63,17 @@ void Game::Update()
 
 	m_Window.SetWindowTitle("Minecraft Clone   | FPS: " + std::to_string((int)(1 / m_deltaTime)));
 
-	// Input precessing
-	if (Input::IsKeyPressed(GLFW_KEY_W))
-		m_Camera.ProcessKeyboard(Direction::FORWARD, m_deltaTime);
-	if (Input::IsKeyPressed(GLFW_KEY_S))
-		m_Camera.ProcessKeyboard(Direction::BACKWARD, m_deltaTime);
-	if (Input::IsKeyPressed(GLFW_KEY_A))
-		m_Camera.ProcessKeyboard(Direction::LEFT, m_deltaTime);
-	if (Input::IsKeyPressed(GLFW_KEY_D))
-		m_Camera.ProcessKeyboard(Direction::RIGHT, m_deltaTime);
-	if (Input::IsKeyPressed(GLFW_KEY_SPACE))
-		m_Camera.ProcessKeyboard(Direction::UP, m_deltaTime);
-	if (Input::IsKeyPressed(GLFW_KEY_LEFT_SHIFT))
-		m_Camera.ProcessKeyboard(Direction::DOWN, m_deltaTime);
+	/// --- Updating systems --------------------------------------------------------------------------
+	m_Player.Update(m_deltaTime);
+	Physics::Update(m_deltaTime);
+	// FPS camera
+	Transform* playerTransform = EntityRegistry::GetComponent<Transform>(m_Player.GetPlayerID());
+	Transform* cameraTransform = EntityRegistry::GetComponent<Transform>(m_Camera.GetCameraID());
+	cameraTransform->position = playerTransform->position;
+	cameraTransform->front = playerTransform->front;
+	cameraTransform->up = playerTransform->up;
 
-	ChunkLoader::Update(m_Camera.GetCameraPosition());
+	ChunkLoader::Update(cameraTransform->position);
 }
 void Game::Draw()
 {
@@ -95,7 +93,15 @@ void Game::Draw()
 	}
 	m_shader.Unbind();
 
-	// Rendering lines
-	m_Renderer.DrawLine(glm::vec3(0.0f, 150.0f, -1.0f), glm::vec3(5.0f, 150.0f, -0.5f), 5, glm::vec3(1.0f, 0.0f, 0.0f), viewMat);
-	m_Renderer.DrawLine(glm::vec3(5.0f, 150.0f, -0.5f), glm::vec3(5.0f, 150.0f, 1.5f), 5, glm::vec3(1.0f, 1.0f, 0.0f), viewMat);
+	// Debug stuff
+	BoxCollider* playerCollider = EntityRegistry::GetComponent<BoxCollider>(m_Player.GetPlayerID());
+	Transform* playerTransform = EntityRegistry::GetComponent<Transform>(m_Player.GetPlayerID());
+
+	glm::vec3 red(1.0f, 0.0f, 0.0f);
+	glm::vec3 blue(0.0f, 0.0f, 1.0f);
+
+	m_Renderer.DrawBoxOutline(playerTransform->position - playerCollider->size, playerTransform->position + playerCollider->size, 4.0f, red, viewMat);
+
+	for (const auto& b : Game::boxes) 
+		m_Renderer.DrawBoxOutline(b, b + glm::vec3(1.0f), 5.0f, blue, viewMat);
 }

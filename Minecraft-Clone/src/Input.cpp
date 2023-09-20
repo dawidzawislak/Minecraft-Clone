@@ -12,8 +12,6 @@ double Input::m_mouseYOffset = 0.0;
 double Input::m_mouseXLast = 0.0;
 double Input::m_mouseYLast = 0.0;
 
-Camera* Input::m_camera = nullptr;
-
 bool Input::m_firstMouse = true;
 
 void Input::InitializeInputClass(Window* window)
@@ -33,10 +31,8 @@ void Input::MouseMoveCallback(GLFWwindow* window, double xPos, double yPos)
 		m_firstMouse = false;
 	}
 
-	m_mouseXOffset = m_mouseX - m_mouseXLast;
-	m_mouseYOffset = m_mouseYLast - m_mouseY; // reversed since y-coordinates go from bottom to top
-
-	m_camera->ProcessMouseMovement(m_mouseXOffset, m_mouseYOffset);
+	m_mouseXOffset += m_mouseX - m_mouseXLast;
+	m_mouseYOffset += m_mouseYLast - m_mouseY;
 
 	m_mouseXLast = m_mouseX;
 	m_mouseYLast = m_mouseY;
@@ -65,4 +61,18 @@ void Input::KeyboardCallback(GLFWwindow* window, int key, int scancode, int acti
 bool Input::IsKeyPressed(int key)
 {
 	return glfwGetKey(*(m_window->GetGLFWWindow()), key) == GLFW_PRESS;
+}
+
+double Input::GetMouseXOffset()
+{
+	double temp = m_mouseXOffset;
+	m_mouseXOffset = 0.0;
+	return temp;
+}
+
+double Input::GetMouseYOffset()
+{
+	double temp = m_mouseYOffset;
+	m_mouseYOffset = 0.0;
+	return temp;
 }

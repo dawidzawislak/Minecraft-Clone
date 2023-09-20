@@ -19,8 +19,9 @@ bool GLLogCall(const char* function, const char* file, int line);
 class Renderer
 {
 	VertexBufferLayout m_lineVBLayout;
-	VertexBuffer m_lineVB;
-	VertexArray m_lineVA;
+	VertexBuffer m_linesVB;
+	IndexBuffer m_linesIB;
+	VertexArray m_linesVA;
 
 	Shader m_lineShader;
 
@@ -33,6 +34,7 @@ public:
 	void Draw(const VertexArray& va, const IndexBuffer& ib) const;
 
 	void DrawLine(const glm::vec3& start, const glm::vec3& end, float width, const glm::vec3& color, const glm::mat4& viewMatrix);
+	void DrawBoxOutline(const glm::vec3& start, const glm::vec3& end, float width, glm::vec3& color, const glm::mat4& viewMatrix);
 
 	void SetProjectionMatrix(const glm::mat4& projMatrix);
 

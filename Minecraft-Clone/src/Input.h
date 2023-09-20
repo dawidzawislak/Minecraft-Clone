@@ -10,8 +10,6 @@ class Input
 	static double m_mouseXLast, m_mouseYLast;
 	static double m_scrollOffset;
 
-	static Camera* m_camera;
-
 	static double m_mouseXOffset, m_mouseYOffset;
 
 	static bool m_firstMouse;
@@ -31,5 +29,6 @@ public:
 	static double GetMousePosX() { return m_mouseX; };
 	static double GetMousePosY() { return m_mouseY; };
 
-	static void SetCameraBinding(Camera* camera) { m_camera = camera; };
+	static double GetMouseXOffset();
+	static double GetMouseYOffset();
 };

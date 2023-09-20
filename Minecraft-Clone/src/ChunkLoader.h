@@ -5,6 +5,8 @@
 #include <unordered_set>
 #include <future>
 #include "Chunk.h"
+#include "BlocksDB.h"
+
 
 class ChunkLoader
 {
@@ -25,6 +27,8 @@ public:
 	static void ReleaseChunks();
 
 	static const std::vector<Chunk*>& GetLoadedChunks();
+
+	static BlockType GetBlock(glm::ivec3 position);
 
 private:
 	ChunkLoader();

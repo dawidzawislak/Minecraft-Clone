@@ -61,7 +61,7 @@ void SetVertexData(UVVertex& vertex, glm::uvec3 pos, BlockFace face, BlockType b
 	vertex.data2 = (uint32_t)vertexPos;
 }
 
-int GetXYZIndex(int x, int y, int z)
+int Chunk::GetXYZIndex(int x, int y, int z)
 {
 	return x + CHUNK_WIDTH * (y + CHUNK_HEIGHT * z);
 }
@@ -118,7 +118,7 @@ void Chunk::SetChunkData(int posX, int posZ, int seed)
 				int maxHeight = (int)fMaxHeight;
 
 				if (y == maxHeight)
-					blocks[GetXYZIndex(x, y, z)] = (int16_t)BlockType::STONE;
+					blocks[GetXYZIndex(x, y, z)] = (int16_t)BlockType::TERRACOTTA_LIME;
 
 				else if (y < maxHeight && y > maxHeight - 10)
 					blocks[GetXYZIndex(x, y, z)] = (int16_t)BlockType::DIRT;

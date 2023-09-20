@@ -7,6 +7,7 @@
 #include <unordered_set>
 #include <queue>
 #include <future>
+#include "Player.h"
 
 constexpr int CHUNKS_RADIUS = 16;
 constexpr int CHUNKS_RADIUS_SQUARED = CHUNKS_RADIUS * CHUNKS_RADIUS;
@@ -17,6 +18,7 @@ class Game
 private:
 	Window m_Window;
 
+	Player m_Player;
 	Camera m_Camera;
 
 	Renderer m_Renderer;
@@ -35,6 +37,8 @@ public:
 	~Game();
 
 	void Run();
+
+	static std::vector<glm::vec3> boxes;
 
 private:
 	void InitializeScene();

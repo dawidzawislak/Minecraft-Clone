@@ -9,6 +9,7 @@ enum class BlockType
 	DIRT,
 	STONE,
 	SAND,
+	TERRACOTTA_LIME,
 	SIZE_OF_STRUCTURE
 };
 

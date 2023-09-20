@@ -1,10 +1,11 @@
 #include "ECS.h"
 
-std::vector<Entity> EntityRegisty::m_entities;
-std::vector<ComponentPool*> EntityRegisty::m_componentPools;
-std::vector<EntityIndex> EntityRegisty::m_freedEntities;
+std::vector<Entity> EntityRegistry::m_entities;
+std::vector<ComponentPool*> EntityRegistry::m_componentPools;
+std::vector<EntityIndex> EntityRegistry::m_freedEntities;
+int EntityRegistry::s_componentCounter = 0;
 
-EntityID EntityRegisty::NewEntity()
+EntityID EntityRegistry::NewEntity()
 {
 	if (!m_freedEntities.empty()) {
 		EntityIndex newIndex = m_freedEntities.back();
@@ -17,7 +18,7 @@ EntityID EntityRegisty::NewEntity()
 	return m_entities.back().id;
 }
 
-void EntityRegisty::DestroyEntity(EntityID entityID)
+void EntityRegistry::DestroyEntity(EntityID entityID)
 {
 	EntityID newID = CreateEntityID(EntityIndex(-1), GetEntityVersion(entityID) + 1);
 	m_entities[GetEntityIndex(entityID)].id = newID;
@@ -25,22 +26,22 @@ void EntityRegisty::DestroyEntity(EntityID entityID)
 	m_freedEntities.push_back(GetEntityIndex(entityID));
 }
 
-EntityID EntityRegisty::GetEntityID(EntityIndex index)
+EntityID EntityRegistry::GetEntityID(EntityIndex index)
 {
 	return m_entities[index].id;
 }
 
-ComponentsMask EntityRegisty::GetEntityComponentsMask(EntityIndex index)
+ComponentsMask EntityRegistry::GetEntityComponentsMask(EntityIndex index)
 {
 	return m_entities[index].componentsMask;
 }
 
-size_t EntityRegisty::GetNumOfEntities()
+size_t EntityRegistry::GetNumOfEntities()
 {
 	return m_entities.size();
 }
 
-void EntityRegisty::Release()
+void EntityRegistry::Release()
 {
 	for (ComponentPool* pool : m_componentPools)
 		delete pool;
