@@ -5,7 +5,7 @@
 
 Player::Player(glm::vec3 pos)
 {
-	m_movementSpeed = 5.0f;
+	m_movementSpeed = 4.0f;
 	m_mouseSensitivity = 0.08f;
 
 	m_playerID = EntityRegistry::NewEntity();
@@ -21,13 +21,15 @@ Player::Player(glm::vec3 pos)
 	rb->velocity = glm::vec3(0.0f);
 	rb->acceleration = glm::vec3(0.0f);
 
-	m_prevY = 1000.0f;
+	m_elapsedSinceJump = 0.0f;
 
 	UpdateTransformVectors(transform);
 }
 
 void Player::Update(float dt)
 {
+	m_elapsedSinceJump += dt;
+
 	float xOffset = m_mouseSensitivity * Input::GetMouseXOffset();
 	float yOffset = m_mouseSensitivity * Input::GetMouseYOffset();
 
@@ -72,8 +74,10 @@ void Player::Update(float dt)
 	rb->velocity.z = m_movementSpeed * velocity.z;
 
 
-	if (Input::IsKeyPressed(GLFW_KEY_SPACE) && transform->position.y == m_prevY)
-		rb->velocity.y = 8.25f;
+	if (Input::IsKeyPressed(GLFW_KEY_SPACE) && m_elapsedSinceJump > 0.5f && transform->position.y == m_prevY) {
+		rb->velocity.y = 7.0f;
+		m_elapsedSinceJump = 0.0f;
+	}
 
 	m_prevY = transform->position.y;
 }

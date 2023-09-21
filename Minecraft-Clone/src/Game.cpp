@@ -10,9 +10,10 @@
 #include "Physics.h"
 
 static const glm::vec3 PLAYER_INITIAL_POS = glm::vec3(0.0f, 200.0f, 0.0f);
+static const glm::vec3 PLAYER_INITIAL_POS2 = glm::vec3(0.0f, 150.0f, 0.0f);
 
 Game::Game(std::string title, unsigned int width, unsigned int height, bool fullScreen)
-	: m_Window(title, width, height, fullScreen), m_shader("res/shaders/default.shader"), m_Player(PLAYER_INITIAL_POS)
+	: m_Window(title, width, height, fullScreen), m_shader("res/shaders/default.shader"), m_Player(PLAYER_INITIAL_POS)//, m_Camera(PLAYER_INITIAL_POS2)
 {
 	BlockTextureManager::Initialize("res/textures/block");
 	BlocksDB::Initialize();
@@ -67,13 +68,27 @@ void Game::Update()
 	m_Player.Update(m_deltaTime);
 	Physics::Update(m_deltaTime);
 	// FPS camera
+	
 	Transform* playerTransform = EntityRegistry::GetComponent<Transform>(m_Player.GetPlayerID());
 	Transform* cameraTransform = EntityRegistry::GetComponent<Transform>(m_Camera.GetCameraID());
 	cameraTransform->position = playerTransform->position;
 	cameraTransform->front = playerTransform->front;
 	cameraTransform->up = playerTransform->up;
+	
+	/*
+	if (Input::IsKeyPressed(GLFW_KEY_UP))
+		m_Camera.ProcessKeyboard(Direction::FORWARD, m_deltaTime);
+	if (Input::IsKeyPressed(GLFW_KEY_DOWN))
+		m_Camera.ProcessKeyboard(Direction::BACKWARD, m_deltaTime);
+	if (Input::IsKeyPressed(GLFW_KEY_LEFT))
+		m_Camera.ProcessKeyboard(Direction::LEFT, m_deltaTime);
+	if (Input::IsKeyPressed(GLFW_KEY_RIGHT))
+		m_Camera.ProcessKeyboard(Direction::RIGHT, m_deltaTime);
 
+	m_Camera.ProcessMouseMovement(Input::GetMouseXOffset(), Input::GetMouseYOffset());
+	*/
 	ChunkLoader::Update(cameraTransform->position);
+	//ChunkLoader::Update(m_Camera.m_cameraPos);
 }
 void Game::Draw()
 {
@@ -92,16 +107,4 @@ void Game::Draw()
 		m_Renderer.Draw(chunk->renderData.va, chunk->renderData.ib);
 	}
 	m_shader.Unbind();
-
-	// Debug stuff
-	BoxCollider* playerCollider = EntityRegistry::GetComponent<BoxCollider>(m_Player.GetPlayerID());
-	Transform* playerTransform = EntityRegistry::GetComponent<Transform>(m_Player.GetPlayerID());
-
-	glm::vec3 red(1.0f, 0.0f, 0.0f);
-	glm::vec3 blue(0.0f, 0.0f, 1.0f);
-
-	m_Renderer.DrawBoxOutline(playerTransform->position - playerCollider->size, playerTransform->position + playerCollider->size, 4.0f, red, viewMat);
-
-	for (const auto& b : Game::boxes) 
-		m_Renderer.DrawBoxOutline(b, b + glm::vec3(1.0f), 5.0f, blue, viewMat);
 }

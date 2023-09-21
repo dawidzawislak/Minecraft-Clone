@@ -9,6 +9,7 @@ private:
 	float m_movementSpeed;
 	float m_mouseSensitivity;
 
+	float m_elapsedSinceJump;
 	float m_prevY;
 
 public:
