@@ -9,7 +9,7 @@
 #include <future>
 #include "Player.h"
 
-constexpr int CHUNKS_RADIUS = 16;
+constexpr int CHUNKS_RADIUS = 24;
 constexpr int CHUNKS_RADIUS_SQUARED = CHUNKS_RADIUS * CHUNKS_RADIUS;
 static constexpr int SEED = 123;
 
@@ -31,6 +31,8 @@ private:
 	Shader m_shader;
 
 	glm::mat4 m_projMatrix;
+
+	bool m_firstLaunch;
 
 public:
 	Game(std::string title, unsigned int width, unsigned int height, bool fullScreen = false);

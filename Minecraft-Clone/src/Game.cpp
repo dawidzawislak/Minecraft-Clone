@@ -17,7 +17,7 @@ Game::Game(std::string title, unsigned int width, unsigned int height, bool full
 {
 	BlockTextureManager::Initialize("res/textures/block");
 	BlocksDB::Initialize();
-
+	m_firstLaunch = true;
 	InitializeScene();
 }
 
@@ -61,6 +61,13 @@ void Game::Update()
 	float currentFrame = static_cast<float>(glfwGetTime());
 	m_deltaTime = currentFrame - m_lastFrame;
 	m_lastFrame = currentFrame;
+
+	//if (m_firstLaunch) {
+	//	m_deltaTime = 0.0f;
+	//	m_firstLaunch = false;
+	//}
+	if (m_deltaTime > 0.5f)
+		m_deltaTime = 0.5f;
 
 	m_Window.SetWindowTitle("Minecraft Clone   | FPS: " + std::to_string((int)(1 / m_deltaTime)));
 

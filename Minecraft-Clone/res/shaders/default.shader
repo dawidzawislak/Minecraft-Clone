@@ -7,6 +7,7 @@ layout(location = 1) in uint aData2;
 out vec2 fTexCoord;
 flat out uint fFace;
 out vec3 fFragPosition;
+out float visibility;
 
 uniform mat4 uProjMat;
 uniform mat4 uViewMat;
@@ -36,6 +37,9 @@ void unpackData(in uint data1, in uint data2, out uvec3 position, out uint face,
 	vertexPos = data2 % 4u;
 }
 
+const float density = 0.0028;
+const float gradient = 25.0;
+
 void main()
 {
 	uvec3 localPosition;
@@ -51,6 +55,11 @@ void main()
 	fTexCoord.y = texelFetch(uUVsTexture, int(index + 1u)).r;
 
 	fFragPosition = globalPosition;
+
+	float distance = length(globalPosition);
+	visibility = exp(-pow(distance * density, gradient));
+	visibility = clamp(visibility, 0.0, 1.0);
+
 	gl_Position = uProjMat * uViewMat * vec4(globalPosition, 1.0);
 }
 
@@ -62,6 +71,7 @@ out vec4 FragColor;
 in vec2 fTexCoord;
 flat in uint fFace;
 in vec3 fFragPosition;
+in float visibility;
 
 uniform sampler2D uTexture;
 uniform vec3 uSunPosition;
@@ -109,5 +119,5 @@ void main()
 
 	vec3 textureColor = texture(uTexture, fTexCoord).rgb;
 	vec3 resultColor = (ambient + diffuse) * textureColor;
-	FragColor = vec4(resultColor, 1.0);
+	FragColor = mix(vec4(0.2, 0.3, 0.3, 1.0), vec4(resultColor, 1.0), visibility);
 }
