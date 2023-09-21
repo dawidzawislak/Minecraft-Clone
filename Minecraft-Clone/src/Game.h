@@ -32,7 +32,7 @@ private:
 
 	glm::mat4 m_projMatrix;
 
-	bool m_firstLaunch;
+	glm::ivec3 m_outline;
 
 public:
 	Game(std::string title, unsigned int width, unsigned int height, bool fullScreen = false);

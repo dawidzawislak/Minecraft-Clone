@@ -1,2 +1,8 @@
-﻿  ChunkLoader.cpp
+﻿  Game.cpp
+C:\dev\Minecraft-Clone\Minecraft-Clone\src\Physics.h(100,14): warning C4101: 'boxTransform': unreferenced local variable
+C:\dev\Minecraft-Clone\Minecraft-Clone\src\Game.cpp(126,62): warning C4244: 'argument': conversion from 'float' to 'T', possible loss of data
+          with
+          [
+              T=int
+          ]
   Minecraft-Clone.vcxproj -> C:\dev\Minecraft-Clone\bin\x64\Debug\Minecraft-Clone.exe

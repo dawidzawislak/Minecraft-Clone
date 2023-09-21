@@ -17,7 +17,7 @@ Game::Game(std::string title, unsigned int width, unsigned int height, bool full
 {
 	BlockTextureManager::Initialize("res/textures/block");
 	BlocksDB::Initialize();
-	m_firstLaunch = true;
+	m_outline = glm::ivec3(0,0,0);
 	InitializeScene();
 }
 
@@ -61,11 +61,6 @@ void Game::Update()
 	float currentFrame = static_cast<float>(glfwGetTime());
 	m_deltaTime = currentFrame - m_lastFrame;
 	m_lastFrame = currentFrame;
-
-	//if (m_firstLaunch) {
-	//	m_deltaTime = 0.0f;
-	//	m_firstLaunch = false;
-	//}
 	if (m_deltaTime > 0.5f)
 		m_deltaTime = 0.5f;
 
@@ -75,27 +70,40 @@ void Game::Update()
 	m_Player.Update(m_deltaTime);
 	Physics::Update(m_deltaTime);
 	// FPS camera
-	
 	Transform* playerTransform = EntityRegistry::GetComponent<Transform>(m_Player.GetPlayerID());
 	Transform* cameraTransform = EntityRegistry::GetComponent<Transform>(m_Camera.GetCameraID());
 	cameraTransform->position = playerTransform->position;
 	cameraTransform->front = playerTransform->front;
 	cameraTransform->up = playerTransform->up;
-	
-	/*
-	if (Input::IsKeyPressed(GLFW_KEY_UP))
-		m_Camera.ProcessKeyboard(Direction::FORWARD, m_deltaTime);
-	if (Input::IsKeyPressed(GLFW_KEY_DOWN))
-		m_Camera.ProcessKeyboard(Direction::BACKWARD, m_deltaTime);
-	if (Input::IsKeyPressed(GLFW_KEY_LEFT))
-		m_Camera.ProcessKeyboard(Direction::LEFT, m_deltaTime);
-	if (Input::IsKeyPressed(GLFW_KEY_RIGHT))
-		m_Camera.ProcessKeyboard(Direction::RIGHT, m_deltaTime);
 
-	m_Camera.ProcessMouseMovement(Input::GetMouseXOffset(), Input::GetMouseYOffset());
-	*/
+	// Ray casting
+	glm::vec3 start = cameraTransform->position + glm::vec3(0.0f, 0.5f, 0.0f);
+	glm::vec3 end = cameraTransform->position + glm::vec3(0.0f, 0.5f, 0.0f) + (cameraTransform->front * 5.0f);
+
+	float len = glm::length(end - start);
+
+	glm::vec3 pos = start;
+	float lenOff = glm::length(cameraTransform->front * 0.1f);
+
+	for (float i = 0.0f; i < len;) {
+		pos += cameraTransform->front * 0.1f;
+
+		if (ChunkLoader::GetBlock(glm::ivec3(floor(pos.x), floor(pos.y), floor(pos.z))) == BlockType::AIR) {
+			i += lenOff;
+			m_outline = glm::ivec3();
+			continue;
+		}
+
+		m_outline = glm::ivec3(floor(pos.x), floor(pos.y), floor(pos.z));
+		break;
+	}
+
+	if (Input::IsKeyPressed(GLFW_KEY_R) && m_outline != glm::ivec3()) {
+		ChunkLoader::SetBlock(m_outline, BlockType::AIR);
+		m_outline = glm::ivec3();
+	}
+
 	ChunkLoader::Update(cameraTransform->position);
-	//ChunkLoader::Update(m_Camera.m_cameraPos);
 }
 void Game::Draw()
 {
@@ -114,4 +122,10 @@ void Game::Draw()
 		m_Renderer.Draw(chunk->renderData.va, chunk->renderData.ib);
 	}
 	m_shader.Unbind();
+
+	Transform* cameraTransform = EntityRegistry::GetComponent<Transform>(m_Camera.GetCameraID());
+
+	glm::vec3 outlineColor(0.3f, 0.3f, 0.3f);
+
+	m_Renderer.DrawBoxOutline(glm::vec3(m_outline) - glm::vec3(0.001f), glm::vec3(m_outline + glm::ivec3(1.0f)) + glm::vec3(0.001f), 3.0f, outlineColor, viewMat);
 }

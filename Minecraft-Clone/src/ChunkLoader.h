@@ -29,6 +29,7 @@ public:
 	static const std::vector<Chunk*>& GetLoadedChunks();
 
 	static BlockType GetBlock(glm::ivec3 position);
+	static void SetBlock(glm::ivec3 position, BlockType type);
 
 private:
 	ChunkLoader();
