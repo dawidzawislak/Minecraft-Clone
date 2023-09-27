@@ -7,6 +7,16 @@
 #include "VertexArray.h"
 #include "IndexBuffer.h"
 
+enum class BlockFace
+{
+	TOP = 0,
+	FRONT = 1,
+	BACK = 2,
+	LEFT = 3,
+	RIGHT = 4,
+	BOTTOM = 5
+};
+
 struct UVVertex
 {
 	uint32_t data1; // position(17bits), blockFace(3bits), textureID(12bits)

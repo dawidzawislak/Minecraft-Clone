@@ -1,7 +1,14 @@
-﻿  ChunkLoader.cpp
+﻿  Game.cpp
+C:\dev\Minecraft-Clone\Minecraft-Clone\src\Physics.h(100,14): warning C4101: 'boxTransform': unreferenced local variable
+C:\dev\Minecraft-Clone\Minecraft-Clone\src\Game.cpp(143,103): warning C4244: 'argument': conversion from 'float' to 'T', possible loss of data
+          with
+          [
+              T=int
+          ]
+  Main.cpp
 LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
   Generating code
-  7 of 2778 functions ( 0.3%) were compiled, the rest were copied from previous compilation.
+  4 of 2780 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
     10 functions had inline decision re-evaluated but remain unchanged
   Finished generating code

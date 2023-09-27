@@ -33,6 +33,9 @@ private:
 	glm::mat4 m_projMatrix;
 
 	glm::ivec3 m_outline;
+	glm::ivec3 m_blockToSet;
+	bool m_blockDestroyed;
+	bool m_blockSet;
 
 public:
 	Game(std::string title, unsigned int width, unsigned int height, bool fullScreen = false);

@@ -19,6 +19,8 @@ Game::Game(std::string title, unsigned int width, unsigned int height, bool full
 	BlocksDB::Initialize();
 	m_outline = glm::ivec3(0,0,0);
 	InitializeScene();
+	m_blockDestroyed = false;
+	m_blockSet = false;
 }
 
 Game::~Game()
@@ -91,6 +93,7 @@ void Game::Update()
 		if (ChunkLoader::GetBlock(glm::ivec3(floor(pos.x), floor(pos.y), floor(pos.z))) == BlockType::AIR) {
 			i += lenOff;
 			m_outline = glm::ivec3();
+			m_blockToSet = glm::ivec3(floor(pos.x), floor(pos.y), floor(pos.z));
 			continue;
 		}
 
@@ -98,11 +101,21 @@ void Game::Update()
 		break;
 	}
 
-	if (Input::IsKeyPressed(GLFW_KEY_R) && m_outline != glm::ivec3()) {
+	if (Input::IsLeftMouseBtnDown() && m_outline != glm::ivec3() && !m_blockDestroyed) {
 		ChunkLoader::SetBlock(m_outline, BlockType::AIR);
 		m_outline = glm::ivec3();
+		m_blockDestroyed = true;
 	}
+	else if (!Input::IsLeftMouseBtnDown())
+		m_blockDestroyed = false;
 
+	if (Input::IsRightMouseBtnDown() && !m_blockSet) {
+		ChunkLoader::SetBlock(m_blockToSet, BlockType::STONE);
+		m_blockSet = true;
+	}
+	else if (!Input::IsRightMouseBtnDown())
+		m_blockSet = false;
+	
 	ChunkLoader::Update(cameraTransform->position);
 }
 void Game::Draw()

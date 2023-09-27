@@ -13,6 +13,7 @@ class Input
 	static double m_mouseXOffset, m_mouseYOffset;
 
 	static bool m_firstMouse;
+
 private:
 	Input();
 
@@ -25,10 +26,13 @@ public:
 
 	static bool IsKeyPressed(int key);
 
-	static double GetScrollOffset() { return m_scrollOffset; };
-	static double GetMousePosX() { return m_mouseX; };
-	static double GetMousePosY() { return m_mouseY; };
+	static double GetScrollOffset() { return m_scrollOffset; }
+	static double GetMousePosX() { return m_mouseX; }
+	static double GetMousePosY() { return m_mouseY; }
 
 	static double GetMouseXOffset();
 	static double GetMouseYOffset();
+
+	static double IsLeftMouseBtnDown() { return glfwGetMouseButton(*(m_window->GetGLFWWindow()), GLFW_MOUSE_BUTTON_LEFT); }
+	static double IsRightMouseBtnDown() { return glfwGetMouseButton(*(m_window->GetGLFWWindow()), GLFW_MOUSE_BUTTON_RIGHT); }
 };

@@ -16,16 +16,6 @@ FastNoiseLite Chunk::gen;
 constexpr uint32_t MASK_POS = 0x1FFFF;
 constexpr uint32_t MASK_FACE = 0xE0000;
 
-enum class BlockFace
-{
-	TOP = 0,
-	FRONT = 1,
-	BACK = 2,
-	LEFT = 3,
-	RIGHT = 4,
-	BOTTOM = 5
-};
-
 enum class VertexPos
 {
 	LU = 0,
