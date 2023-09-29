@@ -8,6 +8,7 @@
 #include <queue>
 #include <future>
 #include "Player.h"
+#include "Texture.h"
 
 constexpr int CHUNKS_RADIUS = 24;
 constexpr int CHUNKS_RADIUS_SQUARED = CHUNKS_RADIUS * CHUNKS_RADIUS;
@@ -36,6 +37,8 @@ private:
 	glm::ivec3 m_blockToSet;
 	bool m_blockDestroyed;
 	bool m_blockSet;
+
+	Texture m_crosshairTexture;
 
 public:
 	Game(std::string title, unsigned int width, unsigned int height, bool fullScreen = false);

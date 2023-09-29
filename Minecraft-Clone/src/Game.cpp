@@ -14,6 +14,7 @@ static const glm::vec3 PLAYER_INITIAL_POS2 = glm::vec3(0.0f, 150.0f, 0.0f);
 
 Game::Game(std::string title, unsigned int width, unsigned int height, bool fullScreen)
 	: m_Window(title, width, height, fullScreen), m_shader("res/shaders/default.shader"), m_Player(PLAYER_INITIAL_POS)//, m_Camera(PLAYER_INITIAL_POS2)
+	, m_crosshairTexture("res/textures/crosshair.png")
 {
 	BlockTextureManager::Initialize("res/textures/block");
 	BlocksDB::Initialize();
@@ -141,4 +142,7 @@ void Game::Draw()
 	glm::vec3 outlineColor(0.3f, 0.3f, 0.3f);
 
 	m_Renderer.DrawBoxOutline(glm::vec3(m_outline) - glm::vec3(0.001f), glm::vec3(m_outline + glm::ivec3(1.0f)) + glm::vec3(0.001f), 3.0f, outlineColor, viewMat);
+	
+	m_crosshairTexture.Bind(3);
+	m_Renderer.Draw2DTexture(glm::vec2((m_Window.GetWidth() / 2.0f) - 15.0f, (m_Window.GetHeight() / 2.0f) + 15.0f), 30.0f, 30.0f, 3, m_Window.GetWidth(), m_Window.GetHeight());
 }

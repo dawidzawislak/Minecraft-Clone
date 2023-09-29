@@ -18,9 +18,12 @@ bool GLLogCall(const char* function, const char* file, int line)
 }
 
 Renderer::Renderer()
-    :m_lineShader("res/shaders/line.shader")
+    :m_lineShader("res/shaders/line.shader"), m_HUDShader("res/shaders/hud.shader")
 {
     m_lineVBLayout.Push<float>(3);
+
+    m_textureVBLayout.Push<float>(3); // coords
+    m_textureVBLayout.Push<float>(2); // uvs
 
     GLCall(glEnable(GL_CULL_FACE));
     GLCall(glCullFace(GL_BACK));
@@ -108,6 +111,51 @@ void Renderer::DrawBoxOutline(const glm::vec3& start, const glm::vec3& end, floa
     GLCall(glDrawElements(GL_LINES, m_linesIB.GetCount(), GL_UNSIGNED_INT, nullptr));
     GLCall(glLineWidth(1.0f));
     m_lineShader.Unbind();
+}
+
+void Renderer::Draw2DTexture(const glm::vec2& corner, float width, float height, int textureSlot, float wndWidth, float wndHeight)
+{
+    float vertices[] = {
+        corner.x, corner.y, 0.0f, 0.0f, 1.0f,
+        corner.x, corner.y-height, 0.0f, 0.0f, 0.0f,
+        corner.x + width, corner.y - height, 0.0f, 1.0f, 0.0f,
+        corner.x + width, corner.y, 0.0f, 1.0f, 1.0f
+    };
+    //float vertices[] = {
+    //    0.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+    //    0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+    //     1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+    //     1.0f,  1.0f, 0.0f, 1.0f, 1.0f
+    //};
+
+    uint32_t indices[] = {
+        0, 1, 3,
+        1, 2, 3
+    };
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glm::mat4 ortho = glm::ortho(0.0f, wndWidth, 0.0f, wndHeight, -1.0f, 1.0f);
+
+    m_textureVB.SetData(vertices, sizeof(vertices));
+    m_textureVA.AddBuffer(m_textureVB, m_textureVBLayout);
+
+    m_textureIB.SetData(indices, sizeof(indices) / sizeof(uint32_t));
+
+    m_HUDShader.Bind();
+    m_HUDShader.SetUniform1i("uTexture", textureSlot);
+    m_HUDShader.SetUniformMat4f("uProjMatrix", ortho);
+    Draw(m_textureVA, m_textureIB);
+    m_HUDShader.Unbind();
+
+    //m_lineShader.Bind();
+    //m_lineShader.SetUniformMat4f("uViewMat", glm::mat4(1.0f));
+    //m_lineShader.SetUniform3f("uColor", 1.0f, 0.0f, 0.0f);
+    //m_linesVA.Bind();
+    //m_linesIB.Bind();
+    //GLCall(glDrawElements(GL_LINES, m_linesIB.GetCount(), GL_UNSIGNED_INT, nullptr));
+    //m_lineShader.Unbind();
 }
 
 void Renderer::SetProjectionMatrix(const glm::mat4& projMatrix)

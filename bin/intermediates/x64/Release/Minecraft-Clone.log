@@ -1,16 +1,9 @@
-﻿  Game.cpp
-C:\dev\Minecraft-Clone\Minecraft-Clone\src\Physics.h(100,14): warning C4101: 'boxTransform': unreferenced local variable
-C:\dev\Minecraft-Clone\Minecraft-Clone\src\Game.cpp(143,103): warning C4244: 'argument': conversion from 'float' to 'T', possible loss of data
-          with
-          [
-              T=int
-          ]
-  Main.cpp
+﻿  Renderer.cpp
 LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
   Generating code
-  4 of 2780 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
+  2 of 2788 functions (<0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    10 functions had inline decision re-evaluated but remain unchanged
+    12 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
 glew32s.lib(glew.obj) : warning LNK4099: PDB 'vc120.pdb' was not found with 'glew32s.lib(glew.obj)' or at 'C:\dev\Minecraft-Clone\bin\x64\Release\vc120.pdb'; linking object as if no debug info
   Minecraft-Clone.vcxproj -> C:\dev\Minecraft-Clone\bin\x64\Release\Minecraft-Clone.exe

@@ -22,10 +22,17 @@ class Renderer
 	VertexBuffer m_linesVB;
 	IndexBuffer m_linesIB;
 	VertexArray m_linesVA;
-
 	Shader m_lineShader;
 
+	Shader m_HUDShader;
+	VertexBufferLayout m_textureVBLayout;
+	VertexBuffer m_textureVB;
+	IndexBuffer m_textureIB;
+	VertexArray m_textureVA;
+
 	glm::mat4 m_projMatrix;
+
+
 
 public:
 	Renderer();
@@ -35,6 +42,8 @@ public:
 
 	void DrawLine(const glm::vec3& start, const glm::vec3& end, float width, const glm::vec3& color, const glm::mat4& viewMatrix);
 	void DrawBoxOutline(const glm::vec3& start, const glm::vec3& end, float width, glm::vec3& color, const glm::mat4& viewMatrix);
+
+	void Draw2DTexture(const glm::vec2& corner, float width, float height, int textureSlot, float wndWidth, float wndHeight);
 
 	void SetProjectionMatrix(const glm::mat4& projMatrix);
 

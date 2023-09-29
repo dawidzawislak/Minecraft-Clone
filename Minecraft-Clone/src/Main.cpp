@@ -9,7 +9,7 @@
 
 int main()
 {
-    Game game("test", 1280, 720);
+    Game game("Minecraft Clone", 1280, 720);
     game.Run();
     
     return 0;
