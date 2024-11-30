@@ -37,8 +37,8 @@ void unpackData(in uint data1, in uint data2, out uvec3 position, out uint face,
 	vertexPos = data2 % 4u;
 }
 
-const float density = 0.0028;
-const float gradient = 25.0;
+const float density = 0.002;
+const float gradient = 100.0;
 
 void main()
 {

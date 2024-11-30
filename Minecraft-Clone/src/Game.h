@@ -10,7 +10,7 @@
 #include "Player.h"
 #include "Texture.h"
 
-constexpr int CHUNKS_RADIUS = 24;
+constexpr int CHUNKS_RADIUS = 32;
 constexpr int CHUNKS_RADIUS_SQUARED = CHUNKS_RADIUS * CHUNKS_RADIUS;
 static constexpr int SEED = 123;
 
